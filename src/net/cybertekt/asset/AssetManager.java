@@ -146,7 +146,7 @@ public final class AssetManager {
 
     /**
      * Submits a task to construct an {@link Asset asset} from a file located at
-     * the path specified relative to the {@link rootDir root assets directory}
+     * the path specified relative to the {@link #rootDir root assets directory}
      * and returns the corresponding {@link AssetKey asset key}.
      *
      * @param path the location of the file from which to load the
@@ -160,7 +160,7 @@ public final class AssetManager {
 
     /**
      * Submits a task to construct an {@link Asset asset} from a file located at
-     * the path specified relative to the {@link rootDir root assets directory}
+     * the path specified relative to the {@link #rootDir root assets directory}
      * and returns the corresponding {@link AssetKey asset key}. Overloaded to
      * include a boolean that specifies if the asset should be reloaded
      * regardless of if the asset has already been loaded.
@@ -190,6 +190,17 @@ public final class AssetManager {
         return load(key, false);
     }
 
+    /**
+     * Submits tasks for constructing {@link Asset assets} from the files
+     * located at the paths specified relative to the
+     * {@link #rootDir root assets directory} and returns the corresponding
+     * {@link AssetKey asset keys}.
+     *
+     * @param paths the location of the files from which to load the
+     * {@link Asset assets}.
+     * @return an array containing the {@link Asset asset keys} associated with
+     * the {@link Asset assets} to be loaded.
+     */
     public static final AssetKey[] load(final String... paths) {
         AssetKey[] keys = new AssetKey[paths.length];
         for (int i = 0; i < paths.length; i++) {
@@ -198,6 +209,15 @@ public final class AssetManager {
         return keys;
     }
 
+    /**
+     * Submits tasks for constructing {@link Asset assets} associated with the
+     * specified {@link AssetKey asset keys}.
+     *
+     * @param keys the {@link AssetKey asset keys} that correspond to the
+     * {@link Asset assets} to be loaded.
+     * @return an array containing the {@link Asset asset keys} associated with
+     * the {@link Asset assets} to be loaded.
+     */
     public static final AssetKey[] load(final AssetKey... keys) {
         for (final AssetKey key : keys) {
             load(key);
@@ -209,9 +229,13 @@ public final class AssetManager {
      * Submits a task to construct an {@link Asset asset} from the file located
      * at the path defined by the specified {@link AssetKey key}.
      *
-     * @param key
-     * @param reload
-     * @return
+     * @param key the {@link AssetKey asset keys} that correspond to the
+     * {@link Asset asset} to be loaded.
+     * @param reload true to force the asset to be reloaded. If false, and the
+     * asset has already been loaded previously, the cached {@link AssetKey key}
+     * will be returned.
+     * @return the {@link AssetKey asset key} associated with the
+     * {@link Asset asset} to be loaded.
      */
     public static final AssetKey load(final AssetKey key, final boolean reload) {
         if (!reload && pendingAssets.containsKey(key) || cachedAssets.containsKey(key)) {
@@ -243,25 +267,95 @@ public final class AssetManager {
         }
     }
 
+    /**
+     * Retrieves the {@link Asset asset} for the file located at the path
+     * specified. If the asset has already been loaded it will be retrieved from
+     * the {@link #cachedAssets assets cache}. If the requested asset has not
+     * already been loaded it will be loaded in-line which will block the
+     * current thread until the asset has been loaded. If the asset is unable to
+     * be loaded for any reason a {@link #fallbackAssets fallback asset} will be
+     * returned if one exists for the associated asset type. If the asset is
+     * unable to be loaded and no fallback asset exists then an
+     * {@link AssetInitializationException} or {@link AssetNotFoundException}
+     * will be thrown.
+     *
+     * @param path the file path location of the {@link Asset asset} to retrieve
+     * relative to the {@link #rootDir root assets directory}.
+     * @return the requested {@link Asset asset}. If an asset does not exist a
+     * fallback asset will be used instead or a runtime exception thrown if no
+     * fallback asset exists.
+     */
     public static final Asset get(final String path) {
         return get(AssetKey.getKey(path));
     }
 
+    /**
+     * Retrieves the {@link Asset asset} for the file located at the path
+     * specified. If the asset has already been loaded it will be retrieved from
+     * the {@link #cachedAssets assets cache}. If the requested asset has not
+     * already been loaded it will be loaded in-line which will block the
+     * current thread until the asset has been loaded. If the asset is unable to
+     * be loaded for any reason a {@link #fallbackAssets fallback asset} will be
+     * returned if one exists for the associated asset type. If the asset is
+     * unable to be loaded and no fallback asset exists then an
+     * {@link AssetInitializationException} or {@link AssetNotFoundException}
+     * will be thrown.
+     *
+     * @param <T> the type of {@link Asset asset} to retrieve.
+     * @param assetClass the class of the {@link Asset asset} to retrieve.
+     * @param path the file path location of the {@link Asset asset} to retrieve
+     * relative to the {@link #rootDir root assets directory}.
+     * @return the requested {@link Asset asset}. If an asset does not exist a
+     * fallback asset will be used instead or a runtime exception thrown if no
+     * fallback asset exists.
+     */
     public static final <T extends Asset> T get(final Class<T> assetClass, final String path) {
         return assetClass.cast(get(path));
     }
 
+    /**
+     * Retrieves the {@link Asset asset} for the file located at the path
+     * specified by the {@link AssetKey asset key} provided. If the asset has
+     * already be loaded it will be retrieved from the
+     * {@link #cachedAssets assets cache}. If the asset has not be loaded, it
+     * will be loaded in-line which will block the current thread until the
+     * asset has been loaded. If the asset is unable to be loaded for any reason
+     * a {@link #fallbackAssets fallback asset} will be returned if one exists.
+     * If the asset cannot be loaded and no fallback asset exists an
+     * {@link AssetInitializationException} or {@link AssetNotFoundException}
+     * will be thrown.
+     *
+     * @param <T> the type of {@link Asset asset} to retrieve.
+     * @param assetClass the class of the {@link Asset asset} to retrieve.
+     * @param key the {@link AssetKey asset key} associated with the
+     * {@link Asset asset} to be retrieved.
+     * @return the requested {@link Asset asset}. If an asset does not exist a
+     * fallback asset will be used instead or a runtime exception thrown if no
+     * fallback asset exists.
+     */
     public static final <T extends Asset> T get(final Class<T> assetClass, final AssetKey key) {
         return assetClass.cast(get(key));
     }
 
     /**
-     * Retrieves the {@link Asset assets}.
+     * Retrieves the {@link Asset assets} for the files located at the paths
+     * specified. If an asset has already been loaded it will be retrieved from
+     * the {@link #cachedAssets assets cache}. If a requested asset has not
+     * already been loaded it will be loaded in-line which will block the
+     * current thread until the asset has been loaded. If an asset is unable to
+     * be loaded for any reason a {@link #fallbackAssets fallback asset} will be
+     * returned if one exists for the associated asset type. If an asset is
+     * unable to be loaded and no fallback asset exists then an
+     * {@link AssetInitializationException} or {@link AssetNotFoundException}
+     * will be thrown.
      *
-     * @param <T>
-     * @param assetClass
-     * @param paths
-     * @return
+     * @param <T> the type of {@link Asset assets} to retrieve.
+     * @param assetClass the class of the {@link Asset assets} to retrieve.
+     * @param paths the file path location of the {@link Asset assets} to
+     * retrieve relative to the {@link #rootDir root assets directory}.
+     * @return an array containing the requested {@link Asset assets}. If an
+     * asset does not exist a fallback asset will be used instead or a runtime
+     * exception thrown if no fallback asset exists.
      */
     public static final <T extends Asset> T[] get(final Class<T> assetClass, final String... paths) {
         T[] assets = (T[]) Array.newInstance(assetClass, paths.length);
@@ -273,12 +367,23 @@ public final class AssetManager {
 
     /**
      * Retrieves the {@link Asset assets} for the files located at the paths
-     * specified by the {@link AssetKey asset keys} provided.
+     * specified by the {@link AssetKey asset keys} provided. If an asset has
+     * already be loaded it will be retrieved from the
+     * {@link #cachedAssets assets cache}. If an asset has not be loaded, it
+     * will be loaded in-line which will block the current thread until the
+     * asset has been loaded. If an asset is unable to be loaded for any reason
+     * a {@link #fallbackAssets fallback asset} will be returned if one exists.
+     * If the asset cannot be loaded and no fallback asset exists an
+     * {@link AssetInitializationException} or {@link AssetNotFoundException}
+     * will be thrown.
      *
-     * @param <T>
-     * @param assetClass
-     * @param keys
-     * @return
+     * @param <T> the type of {@link Asset assets} to retrieve.
+     * @param assetClass the class of the {@link Asset assets} to retrieve.
+     * @param keys the {@link AssetKey asset keys} associated with the
+     * {@link Asset assets} to be retrieved.
+     * @return an array containing the requested {@link Asset assets}. If an
+     * asset does not exist a fallback asset will be used instead or a runtime
+     * exception thrown if no fallback asset exists.
      */
     public static final <T extends Asset> T[] get(final Class<T> assetClass, final AssetKey... keys) {
         T[] assets = (T[]) Array.newInstance(assetClass, keys.length);
@@ -291,10 +396,21 @@ public final class AssetManager {
     /**
      * Retrieves the {@link Asset asset} for the file located at the path
      * specified by the provided {@link AssetKey#getAbsolutePath() asset key}.
-     * If the asset has already been loaded...
+     * If the asset has already been loaded it will be retrieved from the
+     * {@link #cachedAssets assets cache}. If the asset has not been loaded it
+     * will be loaded in-line which will block the current thread until the
+     * asset has been loaded by its corresponding {@link AssetLoader loader}. If
+     * an asset is unable to be loaded for any reason a
+     * {@link #fallbackAssets fallback asset} will be returned if one exists. If
+     * the asset is unable to be loaded and no fallback asset exists, an
+     * {@link AssetInitializationException} or {@link AssetNotFoundException}
+     * will be thrown.
      *
-     * @param key
-     * @return
+     * @param key the {@link AssetKey asset key} associated with the
+     * {@link Asset asset} to be retrieved.
+     * @return the requested {@link Asset asset} if it exists, otherwise a
+     * fallback asset will be returned or a runtime exception thrown if no
+     * fallback asset exists.
      */
     public static final Asset get(final AssetKey key) {
         Asset asset = cachedAssets.get(key);
@@ -471,7 +587,7 @@ public final class AssetManager {
 
     /**
      * Returns the fallback {@link Asset asset} registered for the specified
-     * {@link AssetType type}
+     * {@link AssetType type}.
      *
      * @param type the {@link AssetType type} of asset for which to retrieve the
      * fallback.
