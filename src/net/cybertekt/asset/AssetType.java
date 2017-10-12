@@ -6,12 +6,15 @@ import net.cybertekt.util.HashCache.MapMode;
 
 /**
  * Asset Type - (C) Cybertekt Software.
- * <p />
+ * 
+ * <p>
  * Immutable class that defines a file type extension. File type extensions are
  * defined as the characters following the last period in the file name. File
  * extensions are not case-sensitive and will always be stored and displayed in
  * uppercase.
- * <p />
+ * </p>
+ * 
+ * <p>
  * Asset types may only be constructed using the static utility method
  * {@link #getType(java.lang.String)}. They are internally cached which
  * guarantees that there is ever only a single active instance for a particular
@@ -20,6 +23,7 @@ import net.cybertekt.util.HashCache.MapMode;
  * obsolete entries whenever the cache is modified. This optimizes them for
  * quick searching and retrieval, especially when used as the key in a
  * {@link java.util.Map} or {@link java.util.IdentityHashMap}.
+ * </p>
  *
  * @version 1.0.0
  * @since 1.0.0

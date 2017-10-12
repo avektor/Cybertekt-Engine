@@ -6,11 +6,14 @@ import net.cybertekt.util.HashCache.MapMode;
 
 /**
  * Asset Key - (C) Cybertekt Software.
- * <p />
- * Immutable object that identifies the case-sensitive file location of an
- * external resource relative to the base assets directory as defined by the
- * {@link AssetManager#rootDir} field.
- * <p />
+ * 
+ * <p>
+ * An asset key is an immutable object that identifies the case-sensitive file
+ * location of an external resource relative to the root assets directory as
+ * defined in the {@link AssetManager#rootDir} field.
+ * </p>
+ * 
+ * <p>
  * Keys may only be constructed using the static utility method
  * {@link #getKey(java.lang.String)}. Each key is internally cached to guarantee
  * that there is ever only a single key instance for particular resource path. A
@@ -19,6 +22,7 @@ import net.cybertekt.util.HashCache.MapMode;
  * whenever the cache is modified. This optimizes them for quick searching and
  * retrieval, especially when used as the key in a {@link java.util.Map} or
  * {@link java.util.IdentityHashMap}.
+ * </p>
  *
  * @version 1.0.0
  * @since 1.0.0
@@ -44,13 +48,15 @@ public final class AssetKey {
     /**
      * Static utility method for retrieving the asset key for the external
      * resource located at the specified case-sensitive file path relative to
-     * the base assets directory. A new key will be constructed if one does not
-     * already exists within the {@link #keyCache}.
+     * the root assets directory as defined within the
+     * {@link AssetManager asset manager}. A new key will be constructed if one
+     * does not already exists within the {@link #keyCache}.
      *
-     * @param path the location of the file for which to retrieve the key.
-     * @return the asset key for the external file located at the specified
-     * path, relative to the base assets directory as defined by the
-     * {@link AssetManager#rootDir} field.
+     * @param path the location of the file for which to retrieve and asset key.
+     * File path locations are relative to the root asset directory as defined
+     * within the {@link AssetManager#rootDir asset manager}.
+     * @return the asset key associated with the external asset located at the
+     * path specified relative to the root assets directory.
      */
     public static final AssetKey getKey(String path) {
         if (path.contains("\\")) {
@@ -63,6 +69,19 @@ public final class AssetKey {
         return key;
     }
 
+    /**
+     * Static utility method for retrieving multiple asset keys for the
+     * resources located at the specified file paths relative to the root assets
+     * directory as defined within the {@link AssetManager asset manager} class.
+     * A new key will be constructed if one does not already exist within the
+     * {@link #keyCache}.
+     *
+     * @param paths the location of the files for which to retrieve an asset
+     * key. File path locations are relative to the root asset directory as
+     * defined within the {@link AssetManager#rootDir asset manager}.
+     * @return an array of asset keys associated with the external assets
+     * located at the paths specified relative to the root assets directory.
+     */
     public static final AssetKey[] getKeys(final String... paths) {
         AssetKey[] keys = new AssetKey[paths.length];
         for (int i = 0; i < paths.length - 1; i++) {
@@ -71,6 +90,22 @@ public final class AssetKey {
         return keys;
     }
 
+    /**
+     * Static utility method for retrieving multiple asset keys for resources
+     * located at the specified file paths with a common base directory. Asset
+     * paths should be specified relative to the root assets directory as
+     * defined within the {@link AssetManager asset manager}. A new key will be
+     * constructed if one does not already exist within the {@link #keyCache}.
+     *
+     * @param baseDir the common base directory from which to load the assets
+     * relative to the root assets directory as defined within the
+     * {@link AssetManager asset manager}.
+     * @param relativeFilePaths the file paths of the asset resources relative
+     * to the root assets directory and the common base directory.
+     * @return an array of asset keys associated with t he external assets
+     * located at the paths specified relative to the root assets directory and
+     * common base directory.
+     */
     public static final AssetKey[] getKeys(final String baseDir, final String... relativeFilePaths) {
         AssetKey[] keys = new AssetKey[relativeFilePaths.length];
         for (int i = 0; i < relativeFilePaths.length - 1; i++) {
@@ -148,6 +183,11 @@ public final class AssetKey {
         return path;
     }
 
+    /**
+     * Returns the absolute path of the asset.
+     *
+     * @return the absolute path of the asset.
+     */
     public final String getAbsolutePath() {
         return AssetManager.rootDir + path;
     }

@@ -2,8 +2,9 @@ package net.cybertekt.asset;
 
 /**
  * Asset - (C) Cybertekt Software.
+ * 
  * <p>
- * Asset is the contract for defining an external resource located at the path
+ * Asset is a contract for defining an external resource located at a path
  * specified by the {@link AssetKey key} provided during construction. All
  * implementing subclasses should be designed in a way as to be considered
  * effectively immutable. An asset can only be constructed by the loader
