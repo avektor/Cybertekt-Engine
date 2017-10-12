@@ -138,20 +138,54 @@ public final class AssetManager {
     /**
      * Private constructor that prohibits the construction of other instances of
      * AssetManager. This class is designed for static access only. Creating
-     * additional instances of this class is prohibited as it will
-     * result in unexpected behavior.
+     * additional instances of this class is prohibited as doing so will result
+     * in unexpected behavior.
      */
     private AssetManager() {
     }
 
+    /**
+     * Submits a task to construct an {@link Asset asset} from a file located at
+     * the path specified relative to the {@link rootDir root assets directory}
+     * and returns the corresponding {@link AssetKey asset key}.
+     *
+     * @param path the location of the file from which to load the
+     * {@link Asset asset}.
+     * @return the {@link AssetKey asset key} associated with the
+     * {@link Asset asset}.
+     */
     public static final AssetKey load(final String path) {
         return load(AssetKey.getKey(path));
     }
 
+    /**
+     * Submits a task to construct an {@link Asset asset} from a file located at
+     * the path specified relative to the {@link rootDir root assets directory}
+     * and returns the corresponding {@link AssetKey asset key}. Overloaded to
+     * include a boolean that specifies if the asset should be reloaded
+     * regardless of if the asset has already been loaded.
+     *
+     * @param path the location of the file from which to load the
+     * {@link Asset asset}.
+     * @param reload true to force the asset to be reloaded. If false, and the
+     * asset has already been loaded previously, the cached {@link AssetKey key}
+     * will be returned.
+     * @return the {@link AssetKey asset key} associated with the
+     * {@link Asset asset}.
+     */
     public static final AssetKey load(final String path, final boolean reload) {
         return load(AssetKey.getKey(path), reload);
     }
 
+    /**
+     * Submits a task to construct the {@link Asset asset} associated with the
+     * specified {@link AssetKey asset key}.
+     *
+     * @param key the {@link AssetKey asset key} containing the location of the
+     * asset to be loaded.
+     * @return the {@link AssetKey asset key} associated with the
+     * {@link Asset asset}.
+     */
     public static final AssetKey load(final AssetKey key) {
         return load(key, false);
     }
@@ -222,7 +256,7 @@ public final class AssetManager {
     }
 
     /**
-     * Retrieves the {@link Asset assets} fo
+     * Retrieves the {@link Asset assets}.
      *
      * @param <T>
      * @param assetClass
