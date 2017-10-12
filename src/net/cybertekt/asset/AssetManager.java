@@ -241,25 +241,25 @@ public final class AssetManager {
         if (!reload && pendingAssets.containsKey(key) || cachedAssets.containsKey(key)) {
             return key;
         }
+        requested.incrementAndGet();
         AssetLoader loader = assetLoaders.get(key.getType());
         if (loader != null) {
             try {
                 pendingAssets.put(key, (Future<Asset>) threadPool.submit(loader.newTask(key, stream(key))));
-                requested.incrementAndGet();
                 return key;
             } catch (final AssetNotFoundException e) {
-                final Asset fallback = getFallback(key.getType());
-                if (fallback != null) {
-                    cachedAssets.put(key, fallback);
+                failed.incrementAndGet();
+                if (getFallback(key.getType()) != null) {
+                    cachedAssets.put(key, getFallback(key.getType()));
                     return key;
                 } else {
                     throw e;
                 }
             }
         } else {
-            final Asset fallback = getFallback(key.getType());
-            if (fallback != null) {
-                cachedAssets.put(key, fallback);
+            failed.incrementAndGet();
+            if (getFallback(key.getType()) != null) {
+                cachedAssets.put(key, getFallback(key.getType()));
                 return key;
             } else {
                 throw new UnsupportedAssetTypeException(key);
@@ -425,12 +425,12 @@ public final class AssetManager {
                 cachedAssets.put(key, asset);
                 pendingAssets.remove(key);
             } catch (final InterruptedException | ExecutionException e) {
-                final Asset fallback = getFallback(key.getType());
-                if (fallback != null) {
-                    cachedAssets.put(key, asset = fallback);
-                    pendingAssets.remove(key);
+                pendingAssets.remove(key);
+                if (getFallback(key.getType()) != null) {
+                    cachedAssets.put(key, getFallback(key.getType()));
+                    return cachedAssets.get(key);
                 } else {
-                    throw new AssetInitializationException(key, e.getLocalizedMessage());
+                    throw new RuntimeException(e.getMessage());
                 }
             }
         } else {
@@ -438,14 +438,14 @@ public final class AssetManager {
             AssetLoader loader = assetLoaders.get(key.getType());
             if (loader != null) {
                 try {
-                    cachedAssets.put(key, asset = loader.loadInline(key, stream(key)));
+                    asset = loader.loadInline(key, stream(key));
+                    cachedAssets.put(key, asset);
                     loaded.incrementAndGet();
                 } catch (final AssetNotFoundException | AssetInitializationException e) {
-                    final Asset fallback = getFallback(key.getType());
                     failed.incrementAndGet();
-
-                    if (fallback != null) {
-                        cachedAssets.put(key, fallback);
+                    if (getFallback(key.getType()) != null) {
+                        cachedAssets.put(key, getFallback(key.getType()));
+                        return cachedAssets.get(key);
                     } else {
                         throw e;
                     }
@@ -486,7 +486,7 @@ public final class AssetManager {
             InputStream stream = new FileInputStream(key.getAbsolutePath());
             return stream;
         } catch (final FileNotFoundException e) {
-            log.info("Could not retrieve stream for resource at: " + key.getAbsolutePath());
+            log.warn("Resource file not found - {}", key.getAbsolutePath());
             throw new AssetNotFoundException(key);
         }
     }
@@ -675,7 +675,7 @@ public final class AssetManager {
      * it has completed all tasks submitted.
      */
     public static final boolean isLoading() {
-        return getLoaded() < getRequested();
+        return getLoaded() + getFailed() < getRequested();
     }
 
     /**
@@ -686,7 +686,7 @@ public final class AssetManager {
      * @return the percentage of submitted tasks that have completed execution.
      */
     public static final float getProgress() {
-        return (getLoaded() < getRequested()) ? (((float) getLoaded()) / ((float) getRequested())) : 1f;
+        return (getLoaded() + getFailed() < getRequested()) ? (((float) getLoaded() + getFailed()) / ((float) getRequested())) : 1f;
     }
 
     /**
@@ -782,8 +782,8 @@ public final class AssetManager {
                  * assets and then throw an AssetInitializationException if
                  * necessary.
                  */
-                log.warn("Failed to load asset {}", e.getMessage());
                 failed.incrementAndGet();
+                log.warn("Failed to load asset {}", e.getMessage());
             }
         }
     }
@@ -852,7 +852,7 @@ public final class AssetManager {
          */
         @Override
         public final String getLocalizedMessage() {
-            return "Could not located resource at: " + key.getAbsolutePath();
+            return "Asset resource located at [" + key.getAbsolutePath() + "] does not exist.";
         }
     }
 

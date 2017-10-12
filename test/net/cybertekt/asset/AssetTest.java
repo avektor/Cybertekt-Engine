@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author dal0119
+ * @author Andrew Vektor
  */
 public class AssetTest {
 
@@ -44,80 +44,42 @@ public class AssetTest {
     public void start() {
         log.info("Application Started - Asset Count is {} - Total Available Processors is {}", AssetManager.getLoaded(), Runtime.getRuntime().availableProcessors());
         long time = System.nanoTime();
-
-        AssetManager.load(AssetKey.getKey("Textures/PNG/Grayscale.png"));
-        AssetManager.load(AssetKey.getKey("Textures/PNG/IDX8.png"));
-        AssetManager.load(AssetKey.getKey("Textures/PNG/LUM8.png"));
-        AssetManager.load(AssetKey.getKey("Textures/PNG/LUMA8.png"));
-        AssetManager.load(AssetKey.getKey("Textures/PNG/RGB08.png"));
-        AssetManager.load(AssetKey.getKey("Textures/PNG/RGB16.png"));
-        AssetManager.load(AssetKey.getKey("Textures/PNG/RGBA08.png"));
-        AssetManager.load(AssetKey.getKey("Textures/PNG/RGBA082.png"));
-        AssetManager.load(AssetKey.getKey("Textures/PNG/RGBA16.png"));
-        //AssetManager.load(AssetKey.getKey("Textures/PNG/Bad.png"));
-
-        //AssetManager.abort(true);
-        //while (AssetManager.isLoading()) {
-        //log.info("Now Loading ... {}/{} - {}%", AssetManager.getLoaded(), AssetManager.getSubmitted(), AssetManager.getProgress());
-        //log.info("Loading Assets ... {}%", AssetManager.getProgress());
-        //}
-        //log.info("Loaded {} of {} assets in {}ms using {} thread(s) - {} Cached", AssetManager.getLoaded(), AssetManager.getSubmitted(), (float) (System.nanoTime() - time) / 1000000L, AssetManager.getPoolSize(), AssetManager.getCacheSize());
-        //log.info("Loading Done - {}/{} - {}%", AssetManager.getLoaded(), AssetManager.getSubmitted(), AssetManager.getProgress());
-         //AssetManager.reset();
-         //AssetManager.load(AssetKey.getKey("Textures/PNG/Grayscale.png"));
-        //AssetManager.load(AssetKey.getKey("Textures/PNG/IDX8.png"));
-        //AssetManager.load(AssetKey.getKey("Textures/PNG/LUM8.png"));
-        long loops = 0;
-        while (AssetManager.isLoading()) {
-            log.info("Now Loading ... {}/{} - {}%", AssetManager.getLoaded(), AssetManager.getRequested(), String.format("%.0f", AssetManager.getProgress() * 100f));
-            loops++;
-        }
-        log.info("Loading Done - {}/{} ({} Failed) - {}% ({} Threads - {} Loops)", AssetManager.getLoaded(), AssetManager.getRequested(), AssetManager.getFailed(), String.format("%.0f", AssetManager.getProgress() * 100f), AssetManager.getPoolSize(), loops);
-
+        
+        // Remove the fallback asset and a runtime exception will occur if you attempt to retrieve a non-existent or invalid PNG asset such as "Textures/PNG/Bad.png" or "Textures/PNG/DoesNotExist.png".
         AssetManager.setFallback(AssetManager.get("Textures/PNG/Grayscale.png"), AssetType.getType("PNG"));
         
-        //Thread t1 = new Thread(new WorkerThread(AssetKey.getKey(paths[0])));
-        //Thread t2 = new Thread(new WorkerThread(AssetKey.getKey(paths[1])));
-        //Thread t3 = new Thread(new WorkerThread(AssetKey.getKey(paths[2])));
-        //Thread t4 = new Thread(new WorkerThread(AssetKey.getKey(paths[3])));
-        //Thread t5 = new Thread(new WorkerThread(AssetKey.getKey(paths[4])));
-        //t1.start();
-        //t2.start();
-        //t3.start();
-        //t4.start();
-        //t5.start();
-        //while (t1.isAlive() || t2.isAlive() || t3.isAlive() || t4.isAlive() || t5.isAlive()) {
-        //log.info("Loading [{}%]", AssetManager.getLoadingStatus());
-        //}
-        //log.info("Loaded {} unique assets in {}ms using {} threads", AssetManager.getAssetCount(), (float) (System.nanoTime() - time) / 1000000L, Thread.activeCount());
+        AssetManager.load("Textures/PNG/Grayscale.png");
+        AssetManager.load("Textures/PNG/IDX8.png");
+        AssetManager.load("Textures/PNG/LUM8.png");
+        AssetManager.load("Textures/PNG/LUMA8.png");
+        AssetManager.load("Textures/PNG/RGB08.png");
+        AssetManager.load("Textures/PNG/RGB16.png");
+        AssetManager.load("Textures/PNG/RGBA08.png");
+        AssetManager.load("Textures/PNG/RGBA082.png");
+        AssetManager.load("Textures/PNG/RGBA16.png");
+        AssetManager.load("Textures/PNG/Bad.png");
+        AssetManager.load("Textures/PNG/DoesNotExist.png");
+        AssetManager.load("Textures/PNG/DoesNotExist2.png");
+        
+        //No Exception Thrown Here If A Fallback Asset Has Been Registered For PNG Asset Types.
+        AssetManager.get("Textures/PNG/Bad.png");
+        AssetManager.get("Textures/PNG/DoesNotExist.png");
+        AssetManager.get("Textures/PNG/DoesNotExist2.png");
+        
+        long loops = 0;
+        while (AssetManager.isLoading()) {
+            log.info("Now Loading ... {}/{}/{} - {}%", AssetManager.getLoaded(), AssetManager.getFailed(), AssetManager.getRequested(), String.format("%.0f", AssetManager.getProgress() * 100f));
+            loops++;
+        }
+        log.info("Loading Done - {}/{}/{} - {}% ({} Threads - {} Loops)", AssetManager.getLoaded(), AssetManager.getFailed(), AssetManager.getRequested(), String.format("%.0f", AssetManager.getProgress() * 100f), AssetManager.getPoolSize(), loops);
         log.info("Loaded {} of {} assets in {}ms using {} thread(s) - {} Cached - (Active Threads: {})", AssetManager.getLoaded(), AssetManager.getRequested(), (float) (System.nanoTime() - time) / 1000000L, AssetManager.getPoolSize(), AssetManager.getCacheSize(), Thread.activeCount());
+        
+        //AssetManager.cachedAssets.keySet().forEach((a) -> {
+        //    log.info("Cached Asset Key - {}", a.getName());
+        //});
     }
 
     private String getRandomImagePath() {
         return paths[new Random().nextInt(5)];
-    }
-
-    public final class WorkerThread implements Runnable {
-
-        private final AssetKey key;
-
-        public WorkerThread(final AssetKey keyToUse) {
-            key = keyToUse;
-        }
-
-        @Override
-        public void run() {
-            //Will this retrieve a cached asset? Need to test this.
-            //long time = System.nanoTime();
-            //log.info("Thread [{}] now loading [{}] - Asset Count is {}",Thread.currentThread().getName(), key.getPath(), AssetManager.getAssetCount());
-            //Image img = AssetManager.get(key, Image.class);
-
-            AssetManager.load(AssetKey.getKey("Textures/PNG/RGB16.png"));
-            AssetManager.load(AssetKey.getKey("Textures/PNG/RGBA08.png"));
-            AssetManager.load(AssetKey.getKey("Textures/PNG/RGBA082.png"));
-            AssetManager.load(AssetKey.getKey("Textures/PNG/RGBA16.png"));
-
-            //log.info("Thread [{}] loaded [{}] in {}ms - Asset Count is {}", Thread.currentThread().getName(), img.getKey().getPath(), (System.nanoTime() - time) / 10000, AssetManager.getLoaded());
-        }
     }
 }
