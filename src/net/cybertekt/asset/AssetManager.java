@@ -27,22 +27,26 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Static utility class that provides functionality for concurrently loading,
  * caching, and constructing {@link Asset assets} from external files located in
- * the projects {@link #rootDir assets\} directory. Assets are loaded via a
- * String or {@link AssetKey asset key} that specifies the location of the file.
+ * {@link #rootDir assets directory} of the project. Assets can be loaded by
+ * passing a String or {@link AssetKey asset key} that specifies the location of
+ * the asset to load. Assets will only be loaded if an
+ * {@link AssetLoader loader} has been registered for the file type extension
+ * that corresponds to the asset.
  * </p>
+ *
  * <p>
  * The static methods provided by this class are <b>NOT</b> thread-safe! This
- * was a conscious design choice as this class itself spawns new threads as
- * needed to handle the requested asset loading tasks. The static methods
- * provided by this class must <b>ONLY</b> be called from the main application
- * thread.
+ * was a conscious design choice as the asset manager itself spawns new daemon
+ * threads as needed to handle the requested asset loading tasks. The static
+ * methods provided by this class should <b>ONLY</b> be called from the main
+ * application thread.
  * </p>
  *
- * {@link AssetLoader asset loaders} and retrieving from external files in a
- * platform independent way.
- *
- * Defines three {@link java.lang.RuntimeException runtime exceptions} that may
- * be thrown when attempting to load external assets.
+ * <p>
+ * This class also defines three types of
+ * {@link java.lang.RuntimeException runtime exceptions} that may be thrown when
+ * attempting to load external assets.
+ * </p>
  *
  * @version 1.0.0
  * @since 1.0.0
@@ -68,20 +72,20 @@ public final class AssetManager {
      * <p>
      * I have done a lot of testing with this and I'm still not entirely sure
      * what type of thread pool to use here. There doesn't seem to be an easy
-     * option for a max-limit, unbounded queue, cached thread pool which I think
-     * would work best for this type of request system. I have slightly explored
-     * the idea of using a working-stealing thread pool but I've read
-     * conflicting information regarding the effectiveness of this approach for
-     * this type of system.
-     * </p>
-     * <p>
-     * A few other simple approaches that will produce different results given
-     * the device the application is running on:
-     * </p>
+     * option for a max-limit, unbounded, cached thread pool which I think would
+     * work best for this type of request system. I have slightly explored the
+     * idea of using a working-stealing thread pool but I've read conflicting
+     * information regarding the effectiveness of this approach for this type of
+     * system. May need to revisit this approach in the future.
+     *
+     * There are a few other simple approaches that will produce different
+     * results depending on the device the application is running on:
+     *
      * private static final ExecutorService threadPool =
      * Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
      * new AssetThreadFactory()); private static final ExecutorService
      * threadPool = Executors.newCachedThreadPool();
+     * </p>
      */
     private static final ThreadPool threadPool = new ThreadPool();
 
@@ -93,7 +97,7 @@ public final class AssetManager {
     private static final Map<AssetType, AssetLoader> assetLoaders = new IdentityHashMap<>();
 
     /**
-     * {@link java.util.concurrent.ConcurrentHashMap Hash map} for storing
+     * {@link java.util.concurrent.ConcurrentHashMap} used for storing
      * {@link Asset assets} that are waiting to be loaded.
      */
     private static final Map<AssetKey, Future<? extends Asset>> pendingAssets = new ConcurrentHashMap<>();
@@ -107,9 +111,9 @@ public final class AssetManager {
 
     /**
      * Stores fallback {@link Asset assets} to be used in the event that an
-     * asset of the same type fails to initialize when requested. This can be
-     * used to prevent {@link AssetInitializationException exceptions} for a
-     * specific asset {@link AssetType type}.
+     * asset of a specified type is unable to be loaded or initialized. This can
+     * be used to prevent {@link AssetInitializationException exceptions} for
+     * each specific asset {@link AssetType type}.
      */
     private static final Map<AssetType, Asset> fallbackAssets = new ConcurrentHashMap<>();
 
@@ -134,7 +138,7 @@ public final class AssetManager {
     /**
      * Private constructor that prohibits the construction of other instances of
      * AssetManager. This class is designed for static access only. Creating
-     * additional instances of this class is strongly discouraged as it will
+     * additional instances of this class is prohibited as it will
      * result in unexpected behavior.
      */
     private AssetManager() {
@@ -635,8 +639,8 @@ public final class AssetManager {
     }
 
     /**
-     * Factory class for generating the daemon threads used for
-     * the concurrent loading of {@link Asset assets}.
+     * Factory class for generating the daemon threads used for the concurrent
+     * loading of {@link Asset assets}.
      */
     private static final class AssetThreadFactory implements ThreadFactory {
 
