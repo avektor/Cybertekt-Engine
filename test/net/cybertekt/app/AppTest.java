@@ -1,14 +1,10 @@
 package net.cybertekt.app;
 
-import net.cybertekt.asset.AssetCache;
-
 /**
  *
  * @author dal0119
  */
 public class AppTest extends Application {
-
-    private AssetCache cache;
     
     public AppTest() {
         super("Application Unit Test");

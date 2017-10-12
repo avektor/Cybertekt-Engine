@@ -1,7 +1,6 @@
 package net.cybertekt.crypto;
 
 import net.cybertekt.app.Application;
-import net.cybertekt.asset.AssetCache;
 import net.cybertekt.exception.CryptoException;
 import net.cybertekt.util.Encoder;
 
@@ -10,8 +9,6 @@ import net.cybertekt.util.Encoder;
  * @author Vektor
  */
 public class CryptoTest extends Application {
-    
-    private AssetCache cache;
 
     public CryptoTest() {
         super("Cryptography Unit Test");
