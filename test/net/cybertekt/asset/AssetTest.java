@@ -1,4 +1,4 @@
-package net.cybertekt.asset;
+ package net.cybertekt.asset;
 
 import java.util.Random;
 import net.cybertekt.asset.image.ImageLoader;
@@ -63,16 +63,17 @@ public class AssetTest {
         
         //No Exception Thrown Here If A Fallback Asset Has Been Registered For PNG Asset Types.
         AssetManager.get("Textures/PNG/Bad.png");
-        AssetManager.get("Textures/PNG/DoesNotExist.png");
-        AssetManager.get("Textures/PNG/DoesNotExist2.png");
+        //AssetManager.get("Textures/PNG/DoesNotExist.png");
+        //AssetManager.get("Textures/PNG/DoesNotExist2.png");
         
         long loops = 0;
+        log.info("Now Loading ... {}/{}/{} - {}%", AssetManager.getLoaded(), AssetManager.getFailed(), AssetManager.getRequested(), String.format("%.0f", AssetManager.getProgress() * 100f));
         while (AssetManager.isLoading()) {
             log.info("Now Loading ... {}/{}/{} - {}%", AssetManager.getLoaded(), AssetManager.getFailed(), AssetManager.getRequested(), String.format("%.0f", AssetManager.getProgress() * 100f));
             loops++;
         }
         log.info("Loading Done - {}/{}/{} - {}% ({} Threads - {} Loops)", AssetManager.getLoaded(), AssetManager.getFailed(), AssetManager.getRequested(), String.format("%.0f", AssetManager.getProgress() * 100f), AssetManager.getPoolSize(), loops);
-        log.info("Loaded {} of {} assets in {}ms using {} thread(s) - {} Cached - (Active Threads: {})", AssetManager.getLoaded(), AssetManager.getRequested(), (float) (System.nanoTime() - time) / 1000000L, AssetManager.getPoolSize(), AssetManager.getCacheSize(), Thread.activeCount());
+        log.info("Loaded {} of {} assets in {}ms using {} thread(s) - {} Cached - (Active Threads: {})", AssetManager.getLoaded(), AssetManager.getRequested(), Math.round((float) (System.nanoTime() - time) / 1000000L), AssetManager.getPoolSize(), AssetManager.getCacheSize(), Thread.activeCount());
         
         //AssetManager.cachedAssets.keySet().forEach((a) -> {
         //    log.info("Cached Asset Key - {}", a.getName());
