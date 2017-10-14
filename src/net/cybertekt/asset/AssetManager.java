@@ -36,10 +36,10 @@ import org.slf4j.LoggerFactory;
  *
  * <p>
  * The static methods provided by this class are <b>NOT</b> thread-safe! This
- * was a conscious design choice as the asset manager itself spawns new daemon
- * threads as needed to handle the requested asset loading tasks. The static
- * methods provided by this class should <b>ONLY</b> be called from the main
- * application thread.
+ * was a conscious design choice as the asset manager itself spawns new threads
+ * as needed to handle the requested asset loading tasks. The static methods
+ * provided by this class should <b>ONLY</b> be called from the main application
+ * thread.
  * </p>
  *
  * <p>
@@ -83,8 +83,10 @@ public final class AssetManager {
      *
      * private static final ExecutorService threadPool =
      * Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
-     * new AssetThreadFactory()); private static final ExecutorService
-     * threadPool = Executors.newCachedThreadPool();
+     * new AssetThreadFactory());
+     *
+     * private static final ExecutorService threadPool =
+     * Executors.newCachedThreadPool();
      * </p>
      */
     private static final ThreadPool threadPool = new ThreadPool();
@@ -789,8 +791,8 @@ public final class AssetManager {
     }
 
     /**
-     * Factory class for generating the daemon threads used for the concurrent
-     * loading of {@link Asset assets}.
+     * Factory class for generating the threads used for the concurrent loading
+     * of {@link Asset assets}.
      */
     private static final class AssetThreadFactory implements ThreadFactory {
 
@@ -805,15 +807,15 @@ public final class AssetManager {
         private final String prefix = "Assets-";
 
         /**
-         * Constructs and returns a new daemon asset thread.
+         * Constructs and returns a asset thread.
          *
          * @param task the runnable task for which to create the thread.
-         * @return the constructed daemon thread.
+         * @return the constructed thread.
          */
         @Override
         public final Thread newThread(final Runnable task) {
             Thread t = new Thread(task, prefix + count++);
-            t.setDaemon(true);
+            //t.setDaemon(true);
             return t;
         }
     }
