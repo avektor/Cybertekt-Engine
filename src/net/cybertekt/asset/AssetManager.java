@@ -27,11 +27,11 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Static utility class that provides functionality for concurrently loading,
  * caching, and constructing {@link Asset assets} from external files located in
- * {@link #rootDir assets directory} of the project. Assets can be loaded by
- * passing a String or {@link AssetKey asset key} that specifies the location of
- * the asset to load. Assets will only be loaded if an
- * {@link AssetLoader loader} has been registered for the file type extension
- * that corresponds to the asset.
+ * {@link #rootDir the root  assets directory} of the project. Assets can be
+ * loaded by passing a String or {@link AssetKey asset key} that specifies the
+ * location of the asset to load. Assets will only be loaded if an
+ * {@link AssetLoader asset loader} has been registered for the file type
+ * extension that corresponds to the asset (such as PNG for image files).
  * </p>
  *
  * <p>
