@@ -38,14 +38,6 @@ public final class AssetKey {
     private static final HashCache<String, AssetKey> keyCache = new HashCache(CacheMode.Weak, MapMode.Hash);
 
     /**
-     * Tracks the total number of constructed keys which is incremented and used
-     * as the hash code for each unique key constructed. This ensures there are
-     * never hash code collisions between keys and optimizes them for use with
-     * {@link java.util.HashMap}.
-     */
-    private static int hashCount = 1;
-
-    /**
      * Static utility method for retrieving the asset key for the external
      * resource located at the specified case-sensitive file path relative to
      * the root assets directory as defined within the
@@ -136,11 +128,6 @@ public final class AssetKey {
     private final AssetType type;
 
     /**
-     * Stores the hash code assigned to the key during construction.
-     */
-    private final int hashCode;
-
-    /**
      * Constructs a new key for the file located at the specified path, relative
      * to the base assets directory as defined by the
      * {@link AssetManager#rootDir} field. This constructor is private in order
@@ -154,7 +141,6 @@ public final class AssetKey {
      */
     private AssetKey(final String assetPath) {
         path = assetPath;
-        hashCode = AssetKey.hashCount++;
         if (path.lastIndexOf('.') > -1) {
             type = AssetType.getType(path.substring(path.lastIndexOf('.') + 1, path.length()));
         } else {
@@ -238,32 +224,5 @@ public final class AssetKey {
     @Override
     public final String toString() {
         return "[" + path + "]";
-    }
-
-    /**
-     * Two keys are only considered to be equal when both point to the same
-     * object instance. As there should only ever be a single instance for a
-     * provided file path, the file paths are not directly compared. This
-     * greatly increases the speed at which keys can be compared and makes them
-     * ideal for use with {@link java.util.IdentityHashMap}.
-     *
-     * @param o the object with which to compare this asset key.
-     * @return true if the provided object is the same instance of asset key as
-     * this, false otherwise.
-     */
-    @Override
-    public final boolean equals(final Object o) {
-        return o == this;
-    }
-
-    /**
-     * Override to return the hash code that was assigned to this asset key
-     * during construction.
-     *
-     * @return the hash code assigned to this asset key.
-     */
-    @Override
-    public final int hashCode() {
-        return hashCode;
     }
 }
