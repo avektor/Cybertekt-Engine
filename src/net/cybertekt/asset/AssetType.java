@@ -6,14 +6,14 @@ import net.cybertekt.util.HashCache.MapMode;
 
 /**
  * Asset Type - (C) Cybertekt Software.
- * 
+ *
  * <p>
  * Immutable class that defines a file type extension. File type extensions are
  * defined as the characters following the last period in the file name. File
  * extensions are not case-sensitive and will always be stored and displayed in
  * uppercase.
  * </p>
- * 
+ *
  * <p>
  * Asset types may only be constructed using the static utility method
  * {@link #getType(java.lang.String)}. They are internally cached which
@@ -39,14 +39,6 @@ public final class AssetType {
     private static final HashCache<String, AssetType> typeCache = new HashCache<>(CacheMode.Weak, MapMode.Hash);
 
     /**
-     * Tracks the total number of constructed types, which is incremented and
-     * used as the hash code for each unique type constructed. This ensures
-     * there are never hash code collisions between types and optimizes them for
-     * use with {@link java.util.HashMap}.
-     */
-    private static int hashCount = 1;
-
-    /**
      * Static utility method for retrieving the asset type for the specified
      * file type extension. File type extensions are <b>not</b> case-sensitive
      * and are automatically converted to uppercase characters. A new type will
@@ -57,7 +49,6 @@ public final class AssetType {
      * @return the asset type for the specified file type extension.
      */
     public static final AssetType getType(final String extension) {
-        updateCache();
         String ext = extension.toUpperCase();
         AssetType type = typeCache.get(ext);
         if (type == null) {
@@ -77,25 +68,11 @@ public final class AssetType {
     }
 
     /**
-     * Call to manually update the internal type cache which will purge obsolete
-     * (unused) AssetType objects from the static type cache. AssetType objects
-     * become obsolete when they no longer have any strong references.
-     */
-    public static void updateCache() {
-        typeCache.update();
-    }
-
-    /**
      * Indicates the file type extension of the external resource. The file type
      * extension is defined as the characters that follow the last period in the
      * file name.
      */
     private final String ext;
-
-    /**
-     * Stores the hash code assigned to this type during construction.
-     */
-    private final int hashCode;
 
     /**
      * Constructs a new type for the specified file extension. This constructor
@@ -108,7 +85,6 @@ public final class AssetType {
      */
     private AssetType(final String extension) {
         ext = extension;
-        hashCode = AssetType.hashCount++;
     }
 
     /**
@@ -123,41 +99,16 @@ public final class AssetType {
     }
 
     /**
-     * Return the asset type file extension with brackets ('[') appended to the
-     * beginning and end of the file extension. This method is intended mainly
-     * for use with logging.
+     * Return the asset type file extension with brackets ('[]') appended to the
+     * beginning and end of the file extension. Use the
+     * {@link #getExt() getExt()} method to get the raw string of the file type
+     * extension defined by this asset type. This method is intended mainly for
+     * use with logging.
      *
-     * @return the asset file path relative to the base assets directory.
+     * @return the file type extension defined by this asset type.
      */
     @Override
     public final String toString() {
         return "[" + ext + "]";
-    }
-
-    /**
-     * Two types are only considered to be equal when both reference the same
-     * object. Extension Strings are not directly compared as there should only
-     * ever be a single instance for a specific file extension. This greatly
-     * increases the speed at which types can be compared and retrieved, making
-     * them ideal for use as the key in a {@link java.util.Map}.
-     *
-     * @param o the object with which to compare this asset key.
-     * @return true if the provided object is the same instance of asset key as
-     * this, false otherwise.
-     */
-    @Override
-    public final boolean equals(final Object o) {
-        return o == this;
-    }
-
-    /**
-     * Returns the hash code that was assigned to this asset type
-     * during construction.
-     *
-     * @return the hash code assigned to this asset type.
-     */
-    @Override
-    public final int hashCode() {
-        return hashCode;
     }
 }
