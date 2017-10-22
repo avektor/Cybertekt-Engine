@@ -5,7 +5,7 @@ import net.cybertekt.asset.image.Image;
 import net.cybertekt.asset.shader.OGLShader;
 import net.cybertekt.display.Display;
 import net.cybertekt.display.input.Input;
-import net.cybertekt.display.input.InputMapping;
+import net.cybertekt.display.input.InputAction;
 import net.cybertekt.exception.OGLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class ImageTest extends BasicApplication {
 
     @Override
     public void init() {
-        display.addInputMapping("print", new InputMapping(Input.Key.P).when(Input.State.Pressed));
+        display.addInputMapping("print", new InputAction(Input.Key.P).when(Input.State.Pressed));
 
         //AssetManager.reset();
         long time = System.nanoTime();

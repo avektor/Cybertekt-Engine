@@ -9,8 +9,8 @@ import net.cybertekt.display.DisplayListener;
 import net.cybertekt.display.DisplaySettings;
 import net.cybertekt.display.WindowSettings;
 import net.cybertekt.display.input.Input;
+import net.cybertekt.display.input.InputAction;
 import net.cybertekt.display.input.InputListener;
-import net.cybertekt.display.input.InputMapping;
 import net.cybertekt.render.OGLRenderer;
 
 /**
@@ -52,7 +52,7 @@ public class BasicApplication extends Application implements DisplayListener, In
         display.addDisplayListener(this);
 
         /* Initialize Basic Input */
-        display.addInputMapping("exit", new InputMapping(Input.Key.Escape).when(Input.State.Pressed));
+        display.addInputMapping("exit", new InputAction(Input.Key.Escape).when(Input.State.Pressed));
         display.addInputListener(this);
 
         super.initialize();

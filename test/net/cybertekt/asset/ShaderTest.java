@@ -6,7 +6,7 @@ import net.cybertekt.app.BasicApplication;
 import net.cybertekt.asset.shader.OGLShader;
 import net.cybertekt.display.Display;
 import net.cybertekt.display.input.Input;
-import net.cybertekt.display.input.InputMapping;
+import net.cybertekt.display.input.InputAction;
 import net.cybertekt.exception.OGLException;
 import net.cybertekt.mesh.Mesh;
 import net.cybertekt.render.OGLShaderProgram;
@@ -74,7 +74,7 @@ public class ShaderTest extends BasicApplication implements Renderer {
     @Override
     public void init() {
         display.setRenderer(this);
-        display.addInputMapping("print", new InputMapping(Input.Key.P).when(Input.State.Pressed));
+        display.addInputMapping("print", new InputAction(Input.Key.P).when(Input.State.Pressed));
         
         long time = System.nanoTime();
         

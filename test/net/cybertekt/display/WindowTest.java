@@ -3,7 +3,7 @@ package net.cybertekt.display;
 import net.cybertekt.app.Application;
 import net.cybertekt.app.BasicApplication;
 import net.cybertekt.display.input.Input;
-import net.cybertekt.display.input.InputMapping;
+import net.cybertekt.display.input.InputAction;
 import net.cybertekt.render.OGLRenderer;
 
 /**
@@ -34,7 +34,7 @@ public class WindowTest extends BasicApplication {
     
     @Override
     public final void init() {
-        display.addInputMapping("print", new InputMapping(Input.Key.P).when(Input.State.Pressed));
+        display.addInputMapping("print", new InputAction(Input.Key.P).when(Input.State.Pressed));
         
         
         Display D2 = Display.create(settings).setRenderer(new OGLRenderer());
