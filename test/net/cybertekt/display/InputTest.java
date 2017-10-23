@@ -54,10 +54,12 @@ public class InputTest extends Application implements InputListener {
         display.addInputMapping("[Walking]", new InputSequence(Input.State.Held, Input.Key.W));
         display.addInputMapping("[Running]", new InputAction(Input.State.Held, Input.Mod.Shift, Input.Key.W));
         
+        display.addInputMapping("[Ctrl + Alt + C]", new InputSequence(Input.State.Pressed, Input.Mod.Ctrl, Input.Mod.Alt, Input.Key.C));
+        
         //display.addInputMapping("[Copy]", new InputSequence(Input.Key.CtrlLeft, Input.Key.C));
         
         //display.addInputMapping("[X] Pressed", new InputMapping(Input.Key.X, Input.State.Pressed, Input.Mode.Trigger));
-        //display.addInputMapping("[X] Released", new InputMapping(Input.Key.X, Input.State.Released, Input.Mode.Trigger));
+        //display.addInputMapping("[X] Released", new InputMapping(Input.Key.X, Input.State.Released, Input.Mode.Trigger)); 
         //display.addInputMapping("[X]", new InputMapping(true, Input.Key.X).when(Input.State.Pressed));
         //display.addInputMapping("[Ctrl + Shift + X]", new InputMapping(Input.Mod.Ctrl, Input.Mod.Shift, Input.Key.X).when(Input.State.Held));
         

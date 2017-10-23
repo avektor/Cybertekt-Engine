@@ -35,15 +35,6 @@ public class InputSequence implements InputMapping {
     private boolean activated = false;
 
     /**
-     * Internal boolean that prevents pressed action events from automatically
-     * being activated when other keys are released. This ensures that pressed
-     * actions only activate the mapping when they are actually pressed, not
-     * when they are held down along with another key and the other keys are
-     * released.
-     */
-    private boolean reset = true;
-
-    /**
      * Defines the input action and exclusive, sequential set of input events
      * that cause this mapping to activate.
      *
@@ -68,26 +59,15 @@ public class InputSequence implements InputMapping {
      */
     @Override
     public final boolean poll(final List<Input> inputMap) {
-        /* Enable Reset When All Inputs Have Been Released */
-        if (inputMap.isEmpty()) {
-            reset = true;
-        }
-
         /* Input Sequence Activation Logic */
         switch (action) {
             case Pressed: {
-                if (reset) {
-                    if (inputMap.containsAll(inputs)) {
-                        reset = false;
-                    }
-                    if (!activated) {
-                        return activated = inputMap.equals(inputs);
-                    } else {
-                        activated = inputMap.equals(inputs);
-                        return false;
-                    }
+                if (!activated) {
+                    return activated = inputMap.equals(inputs);
+                } else {
+                    activated = inputMap.equals(inputs);
+                    return false;
                 }
-                return false;
             }
             case Held: {
                 return activated = inputMap.equals(inputs);
