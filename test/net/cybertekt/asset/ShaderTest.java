@@ -5,8 +5,6 @@ import java.util.Map;
 import net.cybertekt.app.BasicApplication;
 import net.cybertekt.asset.shader.OGLShader;
 import net.cybertekt.display.Display;
-import net.cybertekt.display.input.Input;
-import net.cybertekt.display.input.InputMapping;
 import net.cybertekt.exception.OGLException;
 import net.cybertekt.mesh.Mesh;
 import net.cybertekt.render.OGLShaderProgram;
@@ -68,13 +66,13 @@ public class ShaderTest extends BasicApplication implements Renderer {
     }
 
     public ShaderTest() {
-        super("Shader Test");
+        super("Shader Unit Test");
     }
 
     @Override
     public void init() {
         display.setRenderer(this);
-        display.addInputMapping("print", new InputMapping(Input.Key.P).when(Input.State.Pressed));
+        //display.addInputMapping("print", new InputMapping(Input.Key.P).when(Input.State.Pressed));
         
         long time = System.nanoTime();
         
@@ -142,19 +140,22 @@ public class ShaderTest extends BasicApplication implements Renderer {
     }
     
     @Override
-    public final void stop() {
-        super.stop();
+    public final void destroy() {
         quad.destroy();
     }
     
     @Override
-    public final void onInput(final Display display, final String mapping, final Input.State event, final float tpf) {
-        super.onInput(display, mapping, event, tpf);
+    public final void stop() {
+        super.stop();
+    }
+    
+    @Override
+    public final void onInput(final Display display, final String mapping, final float tpf) {
+        super.onInput(display, mapping, tpf);
         if (mapping.equals("print")) {
             shaders.values().forEach((s) -> {
                 log.info(s.toString());
             });
         }
     }
-
 }

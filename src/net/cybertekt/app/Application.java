@@ -1,6 +1,5 @@
 package net.cybertekt.app;
 
-import java.util.logging.Level;
 import net.cybertekt.display.Display;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import org.slf4j.Logger;

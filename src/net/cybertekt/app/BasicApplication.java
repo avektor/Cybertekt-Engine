@@ -52,7 +52,7 @@ public class BasicApplication extends Application implements DisplayListener, In
         display.addDisplayListener(this);
 
         /* Initialize Basic Input */
-        display.addInputMapping("exit", new InputMapping(Input.Key.Escape).when(Input.State.Pressed));
+        //display.addInputMapping("exit", new InputMapping(Input.Key.Escape).when(Input.State.Pressed));
         display.addInputListener(this);
 
         super.initialize();
@@ -85,7 +85,7 @@ public class BasicApplication extends Application implements DisplayListener, In
 
     @Override
     public void onMove(final Display display, final int xPos, final int yPos) {
-        // log.info("Displayed [{}] moved to ({}, {})", display.getId(), xPos, yPos);
+        //log.info("Displayed [{}] moved to ({}, {})", display.getId(), xPos, yPos);
     }
 
     @Override
@@ -118,8 +118,8 @@ public class BasicApplication extends Application implements DisplayListener, In
     }
     
     @Override
-    public void onScroll(final Display display, final int amount) {
-        //log.info("Mouse Scrolled [{}] on display [{}].", amount, display.getId());
+    public void onMouseScroll(final Display display, final int amount) {
+        log.info("Mouse Scrolled [{}] on display [{}].", amount, display.getId());
     }
     
     @Override
@@ -128,7 +128,7 @@ public class BasicApplication extends Application implements DisplayListener, In
     }
 
     @Override
-    public void onInput(final Display display, final String mapping, final Input.State event, final float tpf) {
+    public void onInput(final Display display, final String mapping, final float tpf) {
         if (mapping.equals("exit")) {
             log.info("Terminating Application");
             stop();

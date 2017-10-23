@@ -6,7 +6,8 @@ import net.cybertekt.math.Vec2f;
 /**
  * Display Device - (C) Cybertekt Software.
  *
- * Immutable class that represents a physical display device such as a monitor.
+ * Immutable class that stores the physical properties and settings of a display
+ * device.
  *
  * @version 1.0.0
  * @since 1.0.0
@@ -40,8 +41,8 @@ public final class DisplayDevice {
     private final DisplayMode settings;
 
     /**
-     * List of alternative {@link DisplayMode display modes} supported by
-     * the device.
+     * List of alternative {@link DisplayMode display modes} supported by the
+     * device.
      */
     private final List<DisplayMode> supportedSettings;
 
@@ -145,37 +146,37 @@ public final class DisplayDevice {
     public final int getPositionY() {
         return (int) position.getY();
     }
-    
+
     public final Vec2f getResolution() {
         return settings.getResolution();
     }
-    
+
     public final int getRefreshRate() {
         return settings.getRefreshRate();
     }
-    
+
     public final int getBpp() {
         return settings.getBpp();
     }
-    
+
     public final DisplayMode getDisplayMode() {
         return settings;
     }
 
     /**
-     * Returns the list of {@link DisplayMode display modes} supported by
-     * the display device.
+     * Returns the list of {@link DisplayMode display modes} supported by the
+     * display device.
      *
-     * @return the list of {@link DisplayMode display modes} supported by
-     * this device.
+     * @return the list of {@link DisplayMode display modes} supported by this
+     * device.
      */
     public final List<DisplayMode> getSupportedDisplaySettings() {
         return supportedSettings;
     }
 
     /**
-     * Indicates if the specified {@link DisplayMode display mode} is
-     * supported by this display device.
+     * Indicates if the specified {@link DisplayMode display mode} is supported
+     * by this display device.
      *
      * @param mode the {@link DisplayMode display mode}.
      * @return true if the specified {@link DisplayMode display mode} is

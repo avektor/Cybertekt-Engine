@@ -2,10 +2,12 @@ package net.cybertekt.display;
 
 import net.cybertekt.app.Application;
 import net.cybertekt.display.input.Input;
+import net.cybertekt.display.input.InputAction;
 import net.cybertekt.math.Vec2f;
 import net.cybertekt.render.OGLRenderer;
 import net.cybertekt.display.input.InputListener;
 import net.cybertekt.display.input.InputMapping;
+import net.cybertekt.display.input.InputSequence;
 
 /**
  * Input Unit Test - (C) Cybertekt Software
@@ -43,26 +45,38 @@ public class InputTest extends Application implements InputListener {
         display.setRenderer(new OGLRenderer());
         
         /* Create and register an action mapping in order to exit the application when the escape key is pressed */
-        display.addInputMapping("exit", new InputMapping(Input.Key.Escape));
+        //display.addInputMapping("exit", new InputMapping(Input.Key.Escape).when(Input.State.Pressed));
+        display.addInputMapping("exit", new InputAction(Input.State.Pressed, Input.Key.Escape));
+        
+        display.addInputMapping("[Copy]", new InputSequence(Input.State.Pressed, Input.Mod.Ctrl, Input.Key.C));
+        display.addInputMapping("[Paste]", new InputSequence(Input.State.Pressed, Input.Mod.Ctrl, Input.Key.V));
+        
+        display.addInputMapping("[Walking]", new InputSequence(Input.State.Held, Input.Key.W));
+        display.addInputMapping("[Running]", new InputAction(Input.State.Held, Input.Mod.Shift, Input.Key.W));
+        
+        //display.addInputMapping("[Copy]", new InputSequence(Input.Key.CtrlLeft, Input.Key.C));
         
         //display.addInputMapping("[X] Pressed", new InputMapping(Input.Key.X, Input.State.Pressed, Input.Mode.Trigger));
         //display.addInputMapping("[X] Released", new InputMapping(Input.Key.X, Input.State.Released, Input.Mode.Trigger));
         
-        display.addInputMapping("[A]", new InputMapping(Input.Key.A).when(Input.State.Pressed, Input.State.Released));
-        display.addInputMapping("[Shift + A]", new InputMapping(Input.Mod.Ctrl, Input.Mod.Shift, Input.Key.X).when(Input.State.Held));
+        //display.addInputMapping("[X]", new InputMapping(true, Input.Key.X).when(Input.State.Pressed));
+        //display.addInputMapping("[Ctrl + Shift + X]", new InputMapping(Input.Mod.Ctrl, Input.Mod.Shift, Input.Key.X).when(Input.State.Held));
         
+        //display.addInputMapping("[Ctrl + C]", new InputMapping(Input.Mod.Ctrl, Input.Key.C).when(Input.State.Pressed));
+        //display.addInputMapping("[Ctrl + Alt + C", new InputMapping(Input.Mod.Ctrl, Input.Mod.Alt, Input.Key.C).when(Input.State.Pressed));
         
-        display.addInputMapping("[美国咖啡]", new InputMapping(Input.Key.W).when(Input.State.Held));
-        display.addInputMapping("[Running]", new InputMapping(Input.Mod.Shift, Input.Key.W).when(Input.State.Held));
+        //display.addInputMapping("[B]", new InputMapping(Input.Key.B).when(Input.State.Pressed, Input.State.Held, Input.State.Released));
         
-        display.addInputMapping("[Scroll]", new InputMapping(Input.Mouse.Scroll));
+        //display.addInputMapping("[Walking]", new InputMapping(Input.Key.W).when(Input.State.Held));
+        //display.addInputMapping("[Running]", new InputMapping(Input.Mod.Shift, Input.Key.W).when(Input.State.Held));
         
-        //display.addInputMapping("[Shift + A] Pressed (Analog)", new InputMapping(new Input[] { Input.Mod.Shift, Input.Key.A }, Input.State.Pressed));
-
-            //display.addInputMapping("[Shift + X] Pressed", new InputMapping(new Input[] { Input.Mod.Shift, Input.Key.X }, Input.State.Pressed));
-        //display.addInputMapping("[Shift + X] Released", new InputMapping(new Input[] { Input.Mod.Shift, Input.Key.X }, Input.State.Released));
+        //display.addInputMapping("[Scroll Up]", new InputMapping(Input.Mouse.ScrollUp).when(Input.State.Pressed));
+        //display.addInputMapping("[Scroll Down]", new InputMapping(Input.Mouse.ScrollDown).when(Input.State.Pressed));
         
-        //display.addInputMapping("[Shift + Left Click] Pressed", new InputMapping(new Input[] { Input.Mod.Shift, Input.Mouse.Left }, Input.State.Pressed));
+        //display.addInputMapping("[Shift + Scroll Up]", new InputMapping(Input.Mod.Shift, Input.Mouse.ScrollUp).when(Input.State.Pressed));
+        //display.addInputMapping("[Shift + Scroll Down]", new InputMapping(Input.Mod.Shift, Input.Mouse.ScrollDown).when(Input.State.Pressed));
+        
+        //display.addInputMapping("[Left Alt]", new InputMapping(Input.Key.AltLeft).when(Input.State.Pressed));
         
         display.addInputListener(this);
     }
@@ -78,10 +92,11 @@ public class InputTest extends Application implements InputListener {
     }
     
     @Override
-    public final void onInput(final Display display, final String mapping, final Input.State event, final float tpf) {
-        log.info("{} - {}", mapping, event);
+    public final void onInput(final Display display, final String mapping, final float tpf) {
         if (mapping.equals("exit")) {
             stop();
+        } else {
+            log.info("{}", mapping);
         }
     }
 }

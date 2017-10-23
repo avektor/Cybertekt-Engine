@@ -34,7 +34,7 @@ public class WindowTest extends BasicApplication {
     
     @Override
     public final void init() {
-        display.addInputMapping("print", new InputMapping(Input.Key.P).when(Input.State.Pressed));
+        //display.addInputMapping("print", new InputMapping(Input.Key.P).when(Input.State.Pressed));
         
         
         Display D2 = Display.create(settings).setRenderer(new OGLRenderer());

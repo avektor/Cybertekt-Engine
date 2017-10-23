@@ -67,7 +67,7 @@ public interface DisplayListener {
      */
     public abstract void onMouseEnter(final Display display, final boolean entered);
     
-    public abstract void onScroll(final Display display, final int amount);
+    public abstract void onMouseScroll(final Display display, final int amount);
     
     public abstract void onMouseMove(final Display display, final int xPos, final int yPos);
 

@@ -2,7 +2,6 @@ package net.cybertekt.asset;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.cybertekt.util.FastMath;
 import net.cybertekt.util.HashCache;
 import net.cybertekt.util.HashCache.CacheMode;
 import net.cybertekt.util.HashCache.MapMode;
@@ -17,9 +16,9 @@ public class HashTest {
 
     public static final Logger log = LoggerFactory.getLogger(HashTest.class);
 
-    private HashCache<AssetKey, Float> hashCache = new HashCache<>(CacheMode.Soft, MapMode.Concurrent);
+    private final HashCache<AssetKey, Float> hashCache = new HashCache<>(CacheMode.Soft, MapMode.Concurrent);
 
-    private List<AssetKey> keyList = new ArrayList<>();
+    private final List<AssetKey> keyList = new ArrayList<>();
 
     public static void main(final String[] args) {
         HashTest app = new HashTest();
@@ -33,11 +32,11 @@ public class HashTest {
             hashCache.put(k, 1f);
             keyList.add(k);
         }
-        keyList.stream().forEach((k) -> {
-            hashCache.get(k);
-        });
-        float elapsed = System.nanoTime() - time;
-        log.info("Hash Cache Access Speed - [{}] Keys Cached - Took [{}ms] - [{} k/s]", AssetKey.getKeyCount(), (int) elapsed, (int) elapsed / keyList.size());
+        //keyList.stream().forEach((k) -> {
+        //    hashCache.get(k);
+        //});
+        float elapsed = (System.nanoTime() - time) / 1000000;
+        log.info("Hash Cache Speed - [{}] Keys Cached - Took [{}ms]", AssetKey.getKeyCount(), (int) elapsed);
 
     }
 

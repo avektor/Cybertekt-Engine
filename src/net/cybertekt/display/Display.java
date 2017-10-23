@@ -4,7 +4,6 @@ import net.cybertekt.display.input.Input;
 import java.lang.reflect.Field;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -87,18 +86,24 @@ import net.cybertekt.display.input.InputListener;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetMonitorPhysicalSize;
 import static org.lwjgl.glfw.GLFW.glfwGetMonitorPos;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
+import org.lwjgl.glfw.GLFWWindowPosCallback;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * Display - (C) Cybertekt Software
  *
- *
- * Represents a single windowed or fullscreen rendering context. Display objects
- * are not instantiated directly and are instead created (always in the main
- * application thread) using the static utility methods provided by this class.
- * The actual rendering contexts are created by {@link org.lwjgl.glfw GLFW} and
- * therefore the static methods of this class must never be called from outside
- * of the main application thread.
+ * <p>
+ * Defines a single windowed or fullscreen GLFW display. Display objects cannot
+ * be instantiated directly and instead must be created using the static utility
+ * methods provided by this class. Each display has its own rendering context
+ * controlled by the {@link Renderer renderer} which can be defined using the
+ * {@link Display#setRenderer(net.cybertekt.render.Renderer) method}. Displays
+ * <b>must only be created within the main application thread</b>. Attempting to
+ * create a display outside of the main application thread will cause unexpected
+ * results.
+ * </p>
  *
  * @version 1.0.0
  * @since 1.0.0
@@ -117,13 +122,13 @@ public final class Display {
     private static final GLFWErrorCallback ERROR_CALLBACK;
 
     /**
-     * Callback for receiving device connect/disconnect events from GLFW.
+     * Callback for receiving device connection events from GLFW.
      */
     private static final GLFWMonitorCallback DEVICE_CALLBACK;
 
     /**
      * Stores each active {@link Display display} created by the application
-     * based when its GLFW display ID.
+     * using the unique identifier assigned to the display by GLFW.
      */
     private static final Map<Long, Display> DISPLAYS = new ConcurrentHashMap<>();
 
@@ -134,8 +139,8 @@ public final class Display {
     private static final Map<Long, DisplayDevice> DEVICES = new ConcurrentHashMap<>();
 
     /**
-     * Static initialization block that sets the location of the LWJGL natives
-     * and initializes GLFW.
+     * Static initialization block that initializes GLFW and set the error and
+     * monitor callbacks.
      */
     static {
         /* Initialize GLFW */
@@ -198,10 +203,11 @@ public final class Display {
      * {@link Display display} from outside of the main application thread.</b>
      *
      * @param settings the window initialization settings.
-     * @return the created display.
+     * @return the {@link Display display} created with the provided window
+     * initialization settings.
      */
     public static final Display create(WindowSettings settings) {
-        /* Set GLFW Window Hints */
+        /* Set GLFW Window Hints Using The Provided Settings */
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, settings.isVisible() ? GL_TRUE : GL_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, settings.isResizable() ? GL_TRUE : GL_FALSE);
@@ -217,6 +223,7 @@ public final class Display {
         if (display.ID != 0) {
             /* Attach Display Callbacks */
             glfwSetWindowCloseCallback(display.ID, CALLBACK_CLOSE);
+            glfwSetWindowPosCallback(display.ID, CALLBACK_POSITION);
             glfwSetWindowIconifyCallback(display.ID, CALLBACK_ICONIFY);
             glfwSetWindowFocusCallback(display.ID, CALLBACK_FOCUS);
             glfwSetFramebufferSizeCallback(display.ID, CALLBACK_RESIZE);
@@ -256,6 +263,9 @@ public final class Display {
      */
     public static final void destroy(final Display toDestroy) {
         if (DISPLAYS.containsKey(toDestroy.getId())) {
+            if (toDestroy.hasRenderer()) {
+                toDestroy.renderer.destroy();
+            }
             DISPLAYS.remove(toDestroy.getId());
             glfwDestroyWindow(toDestroy.getId());
         }
@@ -316,6 +326,7 @@ public final class Display {
 
         /* Close Callbacks */
         CALLBACK_CLOSE.close();
+        CALLBACK_POSITION.close();
         CALLBACK_RESIZE.close();
         CALLBACK_ICONIFY.close();
         CALLBACK_FOCUS.close();
@@ -395,26 +406,11 @@ public final class Display {
      * Width and height of the display frame buffer in pixels.
      */
     private final Vec2f SIZE = new Vec2f();
-
+    
     /**
-     * Map which tracks the current state of all possible inputs.
+     * 
      */
-    private final Map<Input, Input.State> INPUT_MAP = new HashMap() {
-        {
-            Arrays.asList(Input.Key.values()).stream().forEach((i) -> {
-                put(i, Input.State.Released);
-            });
-            Arrays.asList(Input.Mod.values()).stream().forEach((i) -> {
-                put(i, Input.State.Released);
-            });
-            Arrays.asList(Input.Mouse.values()).stream().forEach((i) -> {
-                put(i, Input.State.Released);
-            });
-            Arrays.asList(Input.Numpad.values()).stream().forEach((i) -> {
-                put(i, Input.State.Released);
-            });
-        }
-    };
+    private final List<Input> INPUT = new ArrayList();
 
     /**
      * Stores all {@link DisplayListener display listeners} attached to the
@@ -535,36 +531,17 @@ public final class Display {
      * @param tpf
      */
     private void onPoll(final float tpf) {
-
         /**
-         * Update the state of the ALT modifier.
+         * Trigger any input mappings attached to the display.
          */
-        INPUT_MAP.put(Input.Mod.Alt, (INPUT_MAP.get(Input.Key.AltLeft) == Input.State.Pressed || INPUT_MAP.get(Input.Key.AltRight) == Input.State.Pressed)
-                ? Input.State.Pressed : Input.State.Released);
-
-        /**
-         * Update the state of the CTRL modifier.
-         */
-        INPUT_MAP.put(Input.Mod.Ctrl, (INPUT_MAP.get(Input.Key.CtrlLeft) == Input.State.Pressed || INPUT_MAP.get(Input.Key.CtrlRight) == Input.State.Pressed)
-                ? Input.State.Pressed : Input.State.Released);
-
-        /**
-         * Update the state of the SHIFT modifier.
-         */
-        INPUT_MAP.put(Input.Mod.Shift, (INPUT_MAP.get(Input.Key.ShiftLeft) == Input.State.Pressed || INPUT_MAP.get(Input.Key.ShiftRight) == Input.State.Pressed)
-                ? Input.State.Pressed : Input.State.Released);
-
-        /**
-         * Update the state of the SUPER modifier.
-         */
-        INPUT_MAP.put(Input.Mod.Super, (INPUT_MAP.get(Input.Key.SuperLeft) == Input.State.Pressed || INPUT_MAP.get(Input.Key.SuperRight) == Input.State.Pressed)
-                ? Input.State.Pressed : Input.State.Released);
-
-        INPUT_MAPPINGS.entrySet().stream().filter((e) -> (e.getValue().poll(INPUT_MAP))).forEach((e) -> {
+        INPUT_MAPPINGS.entrySet().stream().filter((e) -> (e.getValue().poll(INPUT))).forEach((e) -> {
             INPUT_LISTENERS.stream().forEach((l) -> {
-                l.onInput(this, e.getKey(), e.getValue().getState(), tpf);
+                l.onInput(this, e.getKey(), tpf);
             });
         });
+
+        //INPUT_MAP.put(Input.Mouse.ScrollUp, Input.State.Released);
+        //INPUT_MAP.put(Input.Mouse.ScrollDown, Input.State.Released);
     }
 
     /**
@@ -583,19 +560,30 @@ public final class Display {
     }
 
     /**
-     * Receives display resize events from the
-     * {@link #CALLBACK_RESIZE resize callback} and forwards them to the
-     * {@link DisplayListener display listeners} attached to the display. The
-     * internal {@link #SIZE size} is first set and a render call is made so
-     * that the content buffer is updated each time the frame buffer is resized.
-     * This prevents artifacting during resize operations.
+     * Receives display resize events from GLFW and forwards them to the
+     * {@link DisplayListener#onResize(Display, int, int) onResize()} method of
+     * all {@link DisplayListener listeners} attached to the display that
+     * triggered the event.
      *
-     * @param width the new width of the display frame buffer in pixels.
-     * @param height the new height of the display frame buffer in pixels.
+     * @param width the new width of the display in pixels.
+     * @param height the new height of the display in pixels.
      */
     private void onResize(final int width, final int height) {
+
+        /**
+         * Set the display size instance variable.
+         */
         SIZE.set(width, height);
 
+        /**
+         * Update the OpenGL View Port.
+         */
+        glViewport(0, 0, width, height);
+
+        /**
+         * Makes a render call if the display is not iconified. This is done to
+         * prevent artifacting during resize operations.
+         */
         if (!isIconified()) {
             Display.render(this);
         }
@@ -605,6 +593,15 @@ public final class Display {
         });
     }
 
+    /**
+     * Receives display focus events from GLFW and forwards them to the
+     * {@link DisplayListener#onFocus(Display, boolean) onFocus()} method of all
+     * {@link DisplayListener listeners} attached to the display that triggered
+     * the event.
+     *
+     * @param focus true if the display has gained input focus or false if the
+     * display has lost input focus.
+     */
     protected final void onFocus(final boolean focus) {
         DISPLAY_LISTENERS.stream().forEach((listener) -> {
             listener.onFocus(this, focus);
@@ -612,12 +609,13 @@ public final class Display {
     }
 
     /**
-     * Receives display iconify requests from GLFW and forwards them to the
-     * onIconify() method of any {@link DisplayListener display listeners}
-     * attached to the display.
+     * Receives display iconify events from GLFW and forwards them to the
+     * {@link DisplayListener#onIconify(Display, boolean) onIconify()} method of
+     * all {@link DisplayListener listeners} attached to the display that
+     * triggered the event.
      *
-     * @param iconify true if the display was iconified (minimized), or false if
-     * the display was restored from a previously iconified state.
+     * @param iconify true if the display was iconified (minimized) or false if
+     * the display was restored from an iconified state.
      */
     private void onIconify(final boolean iconify) {
         DISPLAY_LISTENERS.stream().forEach((listener) -> {
@@ -626,9 +624,10 @@ public final class Display {
     }
 
     /**
-     * Receives display close requests from GLFW and forwards them to the
-     * onClose() method of any {@link DisplayListener display listeners}
-     * attached to the display.
+     * Receives display close events from GLFW and forwards them to the
+     * {@link DisplayListener#onClose(Display) onClose()} method of all
+     * {@link DisplayListener listeners} attached to the display that triggered
+     * the event.
      */
     private void onClose() {
         DISPLAY_LISTENERS.stream().forEach((listener) -> {
@@ -637,8 +636,10 @@ public final class Display {
     }
 
     /**
-     * Receives mouse cursor entrance/exit events from GLFW and forwards them to
-     * all {@link DisplayListener display listeners} attached to the display.
+     * Receives cursor entrance/exit events from GLFW and forwards them to the
+     * {@link DisplayListener#onMouseEnter(Display, boolean) onMouseEnter()}
+     * method of all {@link DisplayListener listeners} attached to the display
+     * that triggered the event.
      *
      * @param entered true if the mouse cursor has entered the display or false
      * if the cursor has exited the display.
@@ -650,24 +651,29 @@ public final class Display {
     }
 
     /**
-     * Receives mouse scroll events from GLFW and forwards them to all
-     * {@link DisplayListener display listeners} attached to the display.
+     * Receives mouse scroll events from GLFW and forwards them to the
+     * {@link DisplayListener#onMouseScroll(Display, int) onMouseScroll()}
+     * method of all {@link DisplayListener listeners} attached to the display
+     * that triggered the event.
      *
      * @param amount the scroll intensity. Positive numbers indicate an upwards
      * scroll while negative numbers indicate a downwards scroll.
      */
     private void onMouseScroll(final int amount) {
+        /* Update Input Map */
         DISPLAY_LISTENERS.stream().forEach((listener) -> {
-            listener.onScroll(this, amount);
+            listener.onMouseScroll(this, amount);
         });
     }
 
     /**
-     * Receives mouse movement events from GLFW and forwards them to all
-     * {@link DisplayListener listeners} attached to the display.
+     * Receives mouse movement events from GLFW and forwards them to the
+     * {@link DisplayListener#onMouseMove(Display, int, int) onMouseMove()}
+     * method of all {@link DisplayListener listeners} attached to the display
+     * that triggered the event.
      *
-     * @param xPos the new x-axis position of the cursor.
-     * @param yPos the new y-axis position of the cursor.
+     * @param xPos the new x-axis position of the cursor within the display.
+     * @param yPos the new y-axis position of the cursor within the display.
      */
     private void onMouseMove(final int xPos, final int yPos) {
         DISPLAY_LISTENERS.stream().forEach((listener) -> {
@@ -676,18 +682,55 @@ public final class Display {
     }
 
     /**
-     * Updates the {@link
+     * Updates the {@link #INPUT input map}.
      *
      * @param input
      * @param event
      */
-    public final void onInput(final Input input, final Input.State event) {
-        /* Update Input Map */
-        INPUT_MAP.put(input, event);
+    public final void onInput(final Input input, final Input.State event, final int mods) {
+
+        Input.Mod m = getModifier(input);
+        if (m != null) {
+            if (!INPUT.contains(m)) {
+                if (event == Input.State.Pressed) {
+                    INPUT.add(m);
+                }
+            } else {
+                if (event == Input.State.Released) {
+                    INPUT.remove(m);
+                }
+            }
+        } else {
+            if (!INPUT.contains(input)) {
+                if (event == Input.State.Pressed) {
+                    INPUT.add(input);
+                }
+            } else {
+                if (event == Input.State.Released) {
+                    INPUT.remove(input);
+                }
+            }
+        }
     }
 
-    protected final void onChar(final char key) {
+    private void onChar(final char key) {
         //log.info("Character Pressed: " + key);
+    }
+
+    private Input.Mod getModifier(final Input input) {
+        if (input == Input.Key.AltLeft || input == Input.Key.AltRight) {
+            return Input.Mod.Alt;
+        }
+        if (input == Input.Key.CtrlLeft || input == Input.Key.CtrlRight) {
+            return Input.Mod.Ctrl;
+        }
+        if (input == Input.Key.ShiftLeft || input == Input.Key.ShiftRight) {
+            return Input.Mod.Shift;
+        }
+        if (input == Input.Key.SuperLeft || input == Input.Key.SuperRight) {
+            return Input.Mod.Super;
+        }
+        return null;
     }
 
     /**
@@ -705,17 +748,31 @@ public final class Display {
     }
 
     /**
-     * Returns the identifier assigned to the display by GLFW during
+     * Returns true if the display has a renderer set.
+     *
+     * @return true if the display has a renderer, false otherwise.
+     */
+    public final boolean hasRenderer() {
+        return renderer != null;
+    }
+
+    /**
+     * Returns the unique identifier assigned to the display by GLFW during
      * construction.
      *
-     * @return the GLFW generated display ID.
+     * @return the unique identifier of the display.
      */
     public final long getId() {
         return ID;
     }
 
+    /**
+     * Returns the current size of the display.
+     *
+     * @return
+     */
     public final Vec2f getSize() {
-        return SIZE;
+        return SIZE.copy();
     }
 
     /**
@@ -815,19 +872,35 @@ public final class Display {
      * Removes all registered {@link DisplayListeners listeners} from this
      * display.
      */
-    public final void removeAllDisplayListeners() {
+    public final void clearDisplayListeners() {
         DISPLAY_LISTENERS.clear();
     }
 
+    /**
+     * Adds an {@link InputListener input listener} which will receive input
+     * events from this display.
+     *
+     * @param toAdd the {@link InputListener input listener} to add to this
+     * display.
+     */
     public final void addInputListener(final InputListener toAdd) {
         INPUT_LISTENERS.add(toAdd);
     }
 
+    /**
+     * Attaches an {@link InputListener input listener} to this display which
+     * will receive input events based on the {@link InputMapping mappings} Adds
+     * an {@link InputListener input listener} which will receive input events
+     * from this display.
+     *
+     * @param toRemove the {@link InputListener input listener} to add to this
+     * display.
+     */
     public final void removeInputListener(final InputListener toRemove) {
         INPUT_LISTENERS.remove(toRemove);
     }
 
-    public final void removeAllInputListeners() {
+    public final void clearInputListeners() {
         INPUT_LISTENERS.clear();
     }
 
@@ -835,11 +908,11 @@ public final class Display {
         INPUT_MAPPINGS.put(name, mapping);
     }
 
-    public final void removeActionMapping(final String name) {
+    public final void removeInputMapping(final String name) {
         INPUT_MAPPINGS.remove(name);
     }
 
-    public final void removeAllActionMappings() {
+    public final void clearInputMappings() {
         INPUT_MAPPINGS.clear();
     }
 
@@ -975,6 +1048,18 @@ public final class Display {
     };
 
     /**
+     * Receives display position changes from GLFW and forwards these changes to
+     * all {@link DisplayListener listeners} attached to the target
+     * {@link Display display}.
+     */
+    private static final GLFWWindowPosCallback CALLBACK_POSITION = new GLFWWindowPosCallback() {
+        @Override
+        public final void invoke(final long display, final int xPos, final int yPos) {
+            DISPLAYS.get(display).onMove(xPos, yPos);
+        }
+    };
+
+    /**
      * Receives minimization/maximization (iconify) events from GLFW and
      * forwards these events to the {@link Display display} that triggered them.
      */
@@ -1005,7 +1090,7 @@ public final class Display {
     private static final GLFWKeyCallback CALLBACK_KEY = new GLFWKeyCallback() {
         @Override
         public void invoke(long id, int key, int scancode, int action, int mods) {
-            DISPLAYS.get(id).onInput(KEY_MAP.get(key), STATE_MAP.get(action));
+            DISPLAYS.get(id).onInput(KEY_MAP.get(key), STATE_MAP.get(action), mods);
         }
     };
 
@@ -1052,7 +1137,7 @@ public final class Display {
     private static final GLFWMouseButtonCallback CALLBACK_MOUSE_BUTTON = new GLFWMouseButtonCallback() {
         @Override
         public void invoke(final long id, final int button, final int action, final int mods) {
-            DISPLAYS.get(id).onInput(BUTTON_MAP.get(button), STATE_MAP.get(action));
+            DISPLAYS.get(id).onInput(MOUSE_BUTTON_MAP.get(button), STATE_MAP.get(action), mods);
         }
     };
 
@@ -1086,7 +1171,7 @@ public final class Display {
     private static final Map<Integer, Input.State> STATE_MAP = new TreeMap() {
         {
             put(GLFW.GLFW_PRESS, Input.State.Pressed);
-            put(GLFW.GLFW_REPEAT, Input.State.Pressed);
+            put(GLFW.GLFW_REPEAT, Input.State.Held);
             put(GLFW.GLFW_RELEASE, Input.State.Released);
         }
     };
@@ -1095,7 +1180,7 @@ public final class Display {
      * Stores each {@link Input.Mouse mouse button input} along with its
      * associated GLFW mouse button input.
      */
-    private static final Map<Integer, Input.Mouse> BUTTON_MAP = new TreeMap() {
+    private static final Map<Integer, Input.Mouse> MOUSE_BUTTON_MAP = new TreeMap() {
         {
             put(GLFW.GLFW_MOUSE_BUTTON_LEFT, Input.Mouse.Left);
             put(GLFW.GLFW_MOUSE_BUTTON_RIGHT, Input.Mouse.Right);

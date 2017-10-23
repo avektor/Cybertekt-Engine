@@ -5,22 +5,23 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Input Sequence - (C) Cybertekt Software
+ * Input Action - (C) Cybertekt Software
  *
- * An input sequence defines a set of input events that must be triggered
- * exclusively and in the same order as specified during construction.
- * Exclusivity means that the mapping will not activate if any input events
- * other than those specified during construction have been triggered. The input
- * events must also be triggered in the same order as defined by this mapping.
+ * An input action defines a input mapping that activates when all of the input
+ * events are triggered. The input events are not exclusive or sequential,
+ * meaning any combination of events in any order will activate the mapping as
+ * long as the input events specified during construction are included. Use the
+ * {@link InputSequence input sequence} class for mapping a set of exclusive and
+ * sequential input events.
  *
  * @version 1.0.0
  * @since 1.0.0
  * @author Andrew Vektor
  */
-public class InputSequence implements InputMapping {
+public class InputAction implements InputMapping {
 
     /**
-     * The list of inputs that activate the mapping.
+     * The list of inputs that activates the mapping.
      */
     private List<Input> inputs = new ArrayList();
 
@@ -44,21 +45,20 @@ public class InputSequence implements InputMapping {
     private boolean reset = true;
 
     /**
-     * Defines the input action and exclusive, sequential set of input events
-     * that cause this mapping to activate.
+     * Defines the action and inputs that cause this mapping to activate.
      *
-     * @param action the action, or state that activates the mapping.
-     * @param inputs the inputs that activate the mapping.
+     * @param action the action that causes this mapping to activate.
+     * @param inputs the inputs that activate this mapping.
      */
-    public InputSequence(final Input.State action, final Input... inputs) {
+    public InputAction(final Input.State action, final Input... inputs) {
         this.action = action;
         this.inputs = Arrays.asList(inputs);
     }
 
     /**
-     * Returns true when the input sequence is activated. The input sequence
-     * will activate when all input events have been exclusively triggered in
-     * the same order as defined in the {@link #inputs inputs array}.
+     * Returns true when the input action is activated. The input action will
+     * activate when all input events as defined in the
+     * {@link #inputs inputs array} have been triggered.
      *
      * @param inputMap a map of input events in the order that they were
      * triggered.
@@ -73,7 +73,7 @@ public class InputSequence implements InputMapping {
             reset = true;
         }
 
-        /* Input Sequence Activation Logic */
+        /* Input Action Activation Logic */
         switch (action) {
             case Pressed: {
                 if (reset) {
@@ -81,23 +81,23 @@ public class InputSequence implements InputMapping {
                         reset = false;
                     }
                     if (!activated) {
-                        return activated = inputMap.equals(inputs);
+                        return activated = inputMap.containsAll(inputs);
                     } else {
-                        activated = inputMap.equals(inputs);
+                        activated = inputMap.containsAll(inputs);
                         return false;
                     }
                 }
                 return false;
             }
             case Held: {
-                return activated = inputMap.equals(inputs);
+                return activated = inputMap.containsAll(inputs);
             }
             case Released: {
                 if (!activated) {
-                    activated = inputMap.equals(inputs);
+                    activated = inputMap.containsAll(inputs);
                     return false;
                 } else {
-                    return !(activated = inputMap.equals(inputs));
+                    return !(activated = inputMap.containsAll(inputs));
                 }
             }
         }

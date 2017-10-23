@@ -4,8 +4,6 @@ import net.cybertekt.app.BasicApplication;
 import net.cybertekt.asset.image.Image;
 import net.cybertekt.asset.shader.OGLShader;
 import net.cybertekt.display.Display;
-import net.cybertekt.display.input.Input;
-import net.cybertekt.display.input.InputMapping;
 import net.cybertekt.exception.OGLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +36,7 @@ public class ImageTest extends BasicApplication {
 
     @Override
     public void init() {
-        display.addInputMapping("print", new InputMapping(Input.Key.P).when(Input.State.Pressed));
+        //display.addInputMapping("print", new InputMapping(Input.Key.P).when(Input.State.Pressed));
 
         //AssetManager.reset();
         long time = System.nanoTime();
@@ -48,16 +46,16 @@ public class ImageTest extends BasicApplication {
         AssetManager.load("Textures/PNG/IDX8.png");
         AssetManager.load("Textures/PNG/LUM8.png");
         AssetManager.load("Textures/PNG/RGB08.png");
-        AssetManager.load("Textures/PNG/Bad.png");
+        //AssetManager.load("Textures/PNG/Bad.png");
 
-        AssetManager.load("Shaders/Solid/solid.vert");
-        AssetManager.load("Shaders/Solid/solid.frag");
+        AssetManager.load("Shaders/solid.vert");
+        AssetManager.load("Shaders/solid.frag");
 
         PNGs = AssetManager.get(Image.class,
                 "Textures/PNG/Grayscale.png", "Textures/PNG/IDX8.png");
 
         try {
-            AssetManager.get(OGLShader.class, "Shaders/Solid/solid.vert").compile();
+            AssetManager.get(OGLShader.class, "Shaders/solid.vert").compile();
         } catch (final OGLException e) {
             log.error("Unable to compile shader: {}", e.getLocalizedMessage());
         }
@@ -67,8 +65,8 @@ public class ImageTest extends BasicApplication {
     }
 
     @Override
-    public void onInput(final Display display, final String mapping, final Input.State event, final float tpf) {
-        super.onInput(display, mapping, event, tpf);
+    public void onInput(final Display display, final String mapping, final float tpf) {
+        super.onInput(display, mapping, tpf);
         if (mapping.equals("print")) {
             log.info("\n\tAsset Manager Stats\n\tLoaded: {}\n\tRequested: {}\n\tFailed: {}\n\tCache Size: {}\n\tImages Cached: {}",
                     AssetManager.getLoaded(), AssetManager.getRequested(), AssetManager.getFailed(), AssetManager.getCacheSize(),
