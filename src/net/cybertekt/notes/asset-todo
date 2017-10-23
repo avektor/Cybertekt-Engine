@@ -1,0 +1,26 @@
+Asset Manager Todo:
+
+	Continue testing concurrency. ****
+        Test asset tracking capabilities
+	Finish Documenting.
+        Need to fix abort/cancel methods.
+        
+
+AM CHANGES:
+    Asset Manager is now thread-safe and its methods can be called from any thread.
+    Added automatic status tracking via getCompleted(), getSubmitted(), getActive() methods.
+    Added reset() method to reset the number of submitted/completed tasks. 
+Loading assets concurrently (6 threads) take ~3.3ms per PNG file.
+
+Maybe look into using a work stealing pool instead of a fixed-size pool.
+
+AppStates should have a load() method that shows a loading screen while assets are loaded concurrently by the asset manager.
+
+INFO: Hash Cache Access Speed - [1000000] Iterations - Avg: [127] 
+
+JME3 Time to load 9 PNG Assets: ~300ms
+
+Cybertekt Time to load 9 PNG Assets: ~30ms
+
+
+FIX ASSET TOSTRING METHODS

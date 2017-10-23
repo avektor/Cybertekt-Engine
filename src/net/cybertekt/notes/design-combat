@@ -1,0 +1,22 @@
+Combat Skills
+
+    Marksmanship
+    Swordsmanship
+
+
+Combat Functions
+
+Combat Function Types
+
+    Opener
+    Slash
+    Stab
+    Parry
+    Dodge
+    Block
+    Finisher
+    Passive?
+
+Combat Modules
+    A combat module is a cybernaut component that contains a set of combat functions. The function capacity of a module depends on the skill level of its creator. 
+    Premade modules can be created, trade, and sold by players. More advanced modules have a higher function capacity and may even be capable of storing multiple sets.

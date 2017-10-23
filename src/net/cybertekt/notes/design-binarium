@@ -1,0 +1,28 @@
+Binarium is a cryptocurrency which can be mined by Cybernauts on Cybertekt Resource Instance Severs (CRIS).
+
+    -Binarium is a limited resource and is the life blood of Cybernauts and the Cybertekt Network.
+
+
+    -0.000000000000000000000000
+
+    -10 Bytes = 1 Megabyte (10 bytes can be mined from one Megablock)
+    -10 Megabytes = 1 Gigabyte (100 bytes can be mined from one Gigablock)
+    -10 Gigabytes = 1 Terabyte (1000 bytes can be mined from one Terrablock)
+    -10 Terrabytes = 1 Petabyte (10000 bytes can be mined from one Petablock)
+    -10 Petabytes = 1 Exabyte (100,000 bytes can be mined from one Exablock).
+
+
+
+    -Exabyte = 	1,152,921,504,606,846,976 Bits
+
+1 Block = 1 Bit
+4 Blocks = 1 Byte
+8 Blocks = 1 Kilobyte
+16 Blocks = 1 Megabyte
+32 Blocks = 1 Gigabyte
+64 Blocks = 1 Terabyte
+128 Blocks = 1 Petabyte
+256 Blocks = 1 Exabyte
+512 Blocks = 1 Zetabyte
+1024 Blocks = 1 Yottabyte
+    

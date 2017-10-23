@@ -13,7 +13,6 @@ import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.system.MemoryUtil.memAllocFloat;
 import static org.lwjgl.system.MemoryUtil.memAllocInt;
@@ -23,23 +22,23 @@ import static org.lwjgl.system.MemoryUtil.memFree;
  * Mesh - (C) Cybertekt Software
  *
  *
- * @author Vektor
  * @version 1.0.0
  * @since 1.0.0
+ * @author Vektor
  */
 public class Mesh {
 
     /* Vertex Array Object Identifier */
-    private final int vertexArrayObjectId;
+    private final int vertexArrayObject;
 
     /* Vertex Buffer Object Identifier */
-    private final int vertexPositionBufferObjectId;
+    private final int positionBufferId;
     
     /* Vertex Color Buffer Object Identifier */
-    private final int vertexColorBufferObjectId;
+    private final int colorBufferId;
 
     /* Vertex Indices Buffer Object Identifier */
-    private final int vertexIndicesBufferObjectId;
+    private final int indexBufferId;
 
     /* Number of total vertices in the mesh */
     private final int vertexCount;
@@ -48,34 +47,32 @@ public class Mesh {
         
         vertexCount = indices.length;
 
-        vertexArrayObjectId = glGenVertexArrays();
-        glBindVertexArray(vertexArrayObjectId);
+        vertexArrayObject = glGenVertexArrays();
+        glBindVertexArray(vertexArrayObject);
 
         /* Create Vertex Position Buffer */
-        vertexPositionBufferObjectId = glGenBuffers();
+        positionBufferId = glGenBuffers();
         FloatBuffer vertexBuffer = memAllocFloat(vertices.length);
         vertexBuffer.put(vertices).flip();
-        glBindBuffer(GL_ARRAY_BUFFER, vertexPositionBufferObjectId);
+        glBindBuffer(GL_ARRAY_BUFFER, positionBufferId);
         glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(vertexArrayObjectId);
         memFree(vertexBuffer);
 
         /* Create Vertex Color Buffer */
-        vertexColorBufferObjectId = glGenBuffers();
+        colorBufferId = glGenBuffers();
         FloatBuffer colorBuffer = memAllocFloat(colors.length);
         colorBuffer.put(colors).flip();
-        glBindBuffer(GL_ARRAY_BUFFER, vertexColorBufferObjectId);
+        glBindBuffer(GL_ARRAY_BUFFER, colorBufferId);
         glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
         glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
         memFree(colorBuffer);
         
         /* Create Vertex Indicies Buffer */
-        vertexIndicesBufferObjectId = glGenBuffers();
+        indexBufferId = glGenBuffers();
         IntBuffer indexBuffer = memAllocInt(indices.length);
         indexBuffer.put(indices).flip();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexIndicesBufferObjectId);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
         memFree(indexBuffer);
     }
@@ -86,7 +83,7 @@ public class Mesh {
      * @return the vertex array object identifier.
      */
     public int getVertexArrayId() {
-        return vertexArrayObjectId;
+        return vertexArrayObject;
     }
 
     public int getVertexCount() {
@@ -96,12 +93,12 @@ public class Mesh {
     public void destroy() {
         /* Delete Buffers */
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(vertexPositionBufferObjectId);
-        glDeleteBuffers(vertexColorBufferObjectId);
-        glDeleteBuffers(vertexIndicesBufferObjectId);
+        glDeleteBuffers(positionBufferId);
+        glDeleteBuffers(colorBufferId);
+        glDeleteBuffers(indexBufferId);
         
-        
+        /* Delete Vertex Array Object */
         glBindVertexArray(0);
-        glDeleteVertexArrays(vertexArrayObjectId);
+        glDeleteVertexArrays(vertexArrayObject);
     }
 }

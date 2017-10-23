@@ -2,6 +2,7 @@ package net.cybertekt.render;
 
 import net.cybertekt.asset.shader.OGLShader;
 import net.cybertekt.exception.OGLException;
+import net.cybertekt.math.Vec4f;
 import org.lwjgl.opengl.GL20;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
@@ -12,6 +13,7 @@ import static org.lwjgl.opengl.GL20.glDeleteProgram;
 import static org.lwjgl.opengl.GL20.glDetachShader;
 import static org.lwjgl.opengl.GL20.glGetProgrami;
 import static org.lwjgl.opengl.GL20.glGetShaderi;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL20.glValidateProgram;
@@ -97,6 +99,15 @@ public class OGLShaderProgram {
             log.error("{} Shader Validation Failed: {}", name, GL20.glGetProgramInfoLog(id));
         } else {
             log.info("{} Shader Validation Successful  ", name);
+        }
+    }
+
+    public final void setUniform(final String name, final Vec4f value) {
+        int loc = glGetUniformLocation(id, name);
+        if (loc > -1) {
+            log.info("Uniform {} Not Found", name);
+        } else {
+            log.info("Uniform {} Location Is {}", name, loc);
         }
     }
 

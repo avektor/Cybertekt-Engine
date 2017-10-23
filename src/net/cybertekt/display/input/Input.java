@@ -24,7 +24,7 @@ public interface Input {
     /**
      * Input state constants each represent one of three possible input states.
      */
-    public static enum State implements Input {
+    public static enum State {
         /**
          * Pressed is an <b>action</b> event that occurs <b>once</b> each time
          * as soon as an input is pressed from its released (resting) position.
@@ -69,7 +69,7 @@ public interface Input {
     }
 
     public static enum Mouse implements Input {
-        Left, Right, Middle, Forward, Back, Six, Seven, Eight, Scroll;
+        Left, Right, Middle, Forward, Back, Six, Seven, Eight, ScrollUp, ScrollDown;
     }
 
     public static enum Numpad implements Input {

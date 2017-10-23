@@ -1,0 +1,165 @@
+Cybertekt is invite only.
+Play can themselves earn invites to give to friends.
+
+
+The most powerful weapon in Cybertekt is needed in order to defeat Null.
+Seven components are required in order to forge this weapon.
+Initially, each component is held within the seven Cybertekt Bosses.
+A boss must be defeated in order to aquire the component it holds.
+When a boss is destroyed, the component is given to the player who defeated it.
+Components permanently amplify the power of ANY Cybernaut who have them.
+Only Arktekt Cybernauts can aquire more than one component at the same time.
+
+Cybernauts who are destroyed while under the effects of a component will lose their component.
+
+Cybernauts who aquire a component can choose to turn it over to an Arktekt of their choosing (Vektor/Syntax) or they can selfishly imbue themselves with 
+the power.
+
+
+If Vektor aquires all seven components he will defeat Null and leads into the Dox / Virus Saga.
+If Syntax aquires all seven components he will use it to attack Vektor and his forces.
+
+Components that are given to an Arktek other than Vektor or Syntax will have one of these results:
+	The Artekt will hand the component over to Vektor/Syntax.
+	The Arktekt becomes corrupted by the component(s) and becomes hostile to all players/factions.
+
+
+
+Root Saga
+
+Null Saga
+
+Virus Saga
+
+Botnet Saga
+
+Pirate Saga
+
+Return of Null Saga - (Rootshell is destroyed)
+
+Universal Measurements:
+	Nul Space > Network > Server > Partition > Sector
+
+Final Goal:
+	Allow anyone to configure and create their own Cybertekt-powered Network.
+
+Cybertekt Engine Primary Modules
+	-Application (net.cybertekt.core.app)
+	-Asset Manager (net.cybertekt.core.asset) [85%]
+	-Display Manager (net.cybertekt.core.display) [40%]
+	-Input Manager (net.cybertekt.core.input) [10%] (Not needed?)
+	-Network Manager (net.cybertekt.core.network) [3%]
+	-Scene Manager (net.cybertekt.core.scene) [8%]
+	-Render Manager (net.cybertekt.core.render) [8%]
+	-User Interface (net.cybertekt.core.ui) [?%]
+
+Cybertekt World Engine
+	-Voxel Terrain System
+		-Instead of thinking of terrain units as chunks of different blocks, think of 'blobs' of blocks which all have the same type.
+
+-Divide the scene graph up into sections to reduce the amount of traversals. Divide and conquer is key.
+
+-Different settings depending on location of camera:
+	Close: Full Chunk/Blob generation - Dynamic Blocks Enabled
+	Near: Blob
+	Far: Simplified Blob Generation (block.getSimplified())
+	Very Far:
+	Very Very Far: Render a simplified version of the largest, furthest structures only with simple textures. (I.E. CUT OUT 	THE MIDDLE).
+
+-YOU CAN POSITION / ROTATE / MERGE A BLOCK MESH USING ONLY THE POSITION OF ITS OUTER VERTICES.
+	-ACTUALLY, IT MIGHT BE THE CASE THAT THE ONLY THING THAT MATTERS IS WHICH DIRECTION TO CULL (I.E WHICH FACES TO HIDE) 
+
+-Resource Servers have varying generator settings and "Pseudo" game modes.
+
+-Create Important Notes (Knowledge Base) package and go through all notes and catagorize them.
+	-Should do the same thing when it comes time to develop Cybertekt World Engine.
+
+Rootshell is the current "system server" which is authorative over the entire offical Cybertekt Network
+Each primary server has a single compiler. (Primary Servers)
+
+Player is first greated by the Master Mekanic of the Overdrive Compiler he should treat the player as him/herself (aka breaking the fourth wall) and 
+should showcase/present the players brand-new shiney Cybernaut to him/her.
+
+Knyte AI learns from the actions of its host user.
+
+Should have lots of pop-up dialog links that provide information about keywords just like wikipedia but without the browser.
+
+Functions are modular components that enable special abilities.
+
+Functions can be improved by adding Scripts.
+Equipment can be improved by adding Mods.
+
+The power of a Cybernaut depends on the factors of its "Permanent Record":
+	Commendations - Feedback from players.
+	Demerits - 
+	Medals - Feedback from game.
+	Achievements - Tracks "experience". 
+
+-Function Name - (Function Class) - Target - Cooldown (Optional)
+
+Reboot - (Mekanic - Support) - 10 Minute Cooldown
+Attempt to reboot Cybernaut systems. Can only be used when deactivated.
+
+Scanner Drone - (Mekanic - Support) 
+Deploy a drone that periodically scans the immediate area surrounding the Cybernaut for hidden threats.
+
+Assembly Drone - (Mekanic - Support)
+Deploy a drone that will assist in constructing and/or repairing nearby structures.
+
+Repair Drone(s) - (Mekanic - Support) 
+
+Salvage - (Teknic)
+Salvage what remains of a deactivated Cybernaut. The target Cybernaut will be GC and forced to recompile.
+
+Scanner Sat - (Teknic - Support)
+
+Transporter - (Teknic - Support)
+
+Overcharge - (Knyte - Tank)
+
+Hot Swap - (Knyte)
+
+Cloak - (Crypto) - Instant Self
+You can not use abilities while cloaked.
+
+Ping - (Crypto)
+Reveals any hidden threats in an area surrounding the Cybernaut.
+
+Slipstream - (Crypto)
+Same as Blink
+
+Assassinate - (Crypto) - Instant
+Instantly destroys 
+(Alternate animation mods available)
+
+Roles:
+	Supportive Pure
+	Supportive Hybrid
+
+	Offensive Pure
+	Offensive Hybrid
+
+	Defensive Pure
+	Defensive Hybrid
+
+"Pure" roles should be rarer. 
+"Pures" receive a power bonus.
+"Basic" functions do not have any affect on role.
+
+Classes:
+	Mekanic (Drones)
+	Teknic (Structs)
+	Archivist (Something Like Magic?)
+	Knyte (Jack-of-all-trade, Heavily dependant on weapons / armor)
+	Crypto (Stealth)
+	Arktekt (Super Special Elite Admin Class) [Depreciated - No Compilers Exist]
+
+Special reward for those who pirate the client:
+	-Add a hidden option on license key entry screen: Arg! I be a pirate!
+	-Allows unlicensed players to play on the offical resource servers as a Pirate Knyte.
+	-A pool of "Pirate Knyte" Cyberbots is cycled through. Players don't get the same Cybernaut each time but each Cybernaut tracks its own stats.
+	-This is basically a "hardcore" mode of the game. Players lose access to the Cybernaut if they die while controlling it. 
+	-Players who last exceedingly long on "hardcore" mode may be rewarded with legitimization offer and free month game time.
+
+Lucky Number - Every Cybernaut has a random seed value that's affects random chance. 
+	-The Lucky Number attribute is the last digit of the seed value.
