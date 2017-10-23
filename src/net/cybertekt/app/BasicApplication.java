@@ -9,8 +9,8 @@ import net.cybertekt.display.DisplayListener;
 import net.cybertekt.display.DisplaySettings;
 import net.cybertekt.display.WindowSettings;
 import net.cybertekt.display.input.Input;
+import net.cybertekt.display.input.InputAction;
 import net.cybertekt.display.input.InputListener;
-import net.cybertekt.display.input.InputMapping;
 import net.cybertekt.render.OGLRenderer;
 
 /**

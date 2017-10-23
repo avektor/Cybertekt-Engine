@@ -3,7 +3,7 @@ package net.cybertekt.display;
 import net.cybertekt.app.Application;
 import net.cybertekt.app.BasicApplication;
 import net.cybertekt.display.input.Input;
-import net.cybertekt.display.input.InputMapping;
+import net.cybertekt.display.input.InputAction;
 import net.cybertekt.render.OGLRenderer;
 
 /**
