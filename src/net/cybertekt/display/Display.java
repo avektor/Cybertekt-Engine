@@ -84,12 +84,15 @@ import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWCursorEnterCallback;
 import net.cybertekt.display.input.InputListener;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwGetMonitorPhysicalSize;
 import static org.lwjgl.glfw.GLFW.glfwGetMonitorPos;
+import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import org.lwjgl.glfw.GLFWWindowPosCallback;
 import static org.lwjgl.opengl.GL11.glViewport;
+import org.lwjgl.system.MemoryUtil;
 
 /**
  * Display - (C) Cybertekt Software
@@ -219,8 +222,16 @@ public final class Display {
         /* Create the Display */
         Display display = new Display(glfwCreateWindow(settings.getWidth(), settings.getHeight(), settings.getTitle(), NULL, NULL));
 
-        //display.move(settings.getX(), settings.getY());
         if (display.ID != 0) {
+
+            /* Set initial window position */
+            glfwSetWindowPos(display.ID, settings.getX(), settings.getY());
+            
+            /* Set display window title (if not null) */
+            if (settings.getTitle() != null) {
+                glfwSetWindowTitle(display.ID, settings.getTitle());
+            }
+            
             /* Attach Display Callbacks */
             glfwSetWindowCloseCallback(display.ID, CALLBACK_CLOSE);
             glfwSetWindowPosCallback(display.ID, CALLBACK_POSITION);
@@ -235,11 +246,6 @@ public final class Display {
             glfwSetCursorPosCallback(display.ID, CALLBACK_CURSOR);
             glfwSetCursorEnterCallback(display.ID, CALLBACK_CURSOR_ENTER);
             glfwSetCharCallback(display.ID, CALLBACK_KEY_CHAR);
-
-            /* Set display window title (if not null) */
-            if (settings.getTitle() != null) {
-                glfwSetWindowTitle(display.ID, settings.getTitle());
-            }
             glfwMakeContextCurrent(display.ID);
             GL.createCapabilities();
 
@@ -403,14 +409,13 @@ public final class Display {
     private final long ID;
 
     /**
-     * Width and height of the display frame buffer in pixels.
-     */
-    private final Vec2f SIZE = new Vec2f();
-    
-    /**
-     * 
+     *
      */
     private final List<Input> INPUT = new ArrayList();
+
+    private final IntBuffer WIDTH = MemoryUtil.memAllocInt(1);
+
+    private final IntBuffer HEIGHT = MemoryUtil.memAllocInt(1);
 
     /**
      * Stores all {@link DisplayListener display listeners} attached to the
@@ -569,12 +574,6 @@ public final class Display {
      * @param height the new height of the display in pixels.
      */
     private void onResize(final int width, final int height) {
-
-        /**
-         * Set the display size instance variable.
-         */
-        SIZE.set(width, height);
-
         /**
          * Update the OpenGL View Port.
          */
@@ -772,7 +771,13 @@ public final class Display {
      * @return
      */
     public final Vec2f getSize() {
-        return SIZE.copy();
+        glfwGetWindowSize(ID, WIDTH, HEIGHT);
+        return new Vec2f(WIDTH.get(0), HEIGHT.get(0));
+    }
+
+    public final Vec2f getResolution() {
+        glfwGetFramebufferSize(ID, WIDTH, HEIGHT);
+        return new Vec2f(WIDTH.get(0), HEIGHT.get(0));
     }
 
     /**
