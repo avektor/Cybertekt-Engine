@@ -9,7 +9,8 @@ import net.cybertekt.math.Vec2f;
  * {@link Display#create(net.cybertekt.display.WindowSettings)} for creating
  * windowed {@link Display displays}. These settings are only used during the
  * initialization/creation of windowed displays. Any changes made to these
- * settings will have no effect on windows that have already been initialized.
+ * settings will have no effect on windows that have already been created and
+ * initialized using these settings.
  *
  * @version 1.0.0
  * @since 1.0.0
@@ -49,26 +50,44 @@ public class WindowSettings extends DisplaySettings {
      * Determines if the window should be maximized on initialization.
      */
     private boolean maximized = false;
-    
+
+    /**
+     * Defines default settings for the initialization and construction of a
+     * windowed {@link Display display}.
+     */
     public WindowSettings() {
-        this("Window");
+        this("Untitled Window");
     }
-    
+
+    /**
+     * Defines settings for the initialization and construction of windowed
+     * {@link Display displays}.
+     *
+     * @param title the title of the display window.
+     */
     public WindowSettings(final String title) {
         this(title, new Vec2f(800f, 600f));
     }
-    
+
     /**
-     * Display settings for the initialization and construction of windowed
+     * Defines settings for the initialization and construction of windowed
      * {@link Display displays}.
      *
      * @param title the title of the display window.
      * @param size the width and height of the display window in pixels.
      */
     public WindowSettings(final String title, final Vec2f size) {
-        this(title, size, Display.getPrimaryDisplayDevice().getResolution());
+        this(title, size, Display.getPrimaryDisplayDevice().getResolution().divideLocal(2f).subtractLocal(size.divide(2f)));
     }
 
+    /**
+     * Defines settings for the initialization and construction of windowed
+     * {@link Display displays}.
+     *
+     * @param title the title of the display window.
+     * @param size the width and height of the display window in pixels.
+     * @param location the initial location of the display window.
+     */
     public WindowSettings(final String title, final Vec2f size, final Vec2f location) {
         super(Display.getPrimaryDisplayDevice());
         this.title = title;
@@ -76,25 +95,47 @@ public class WindowSettings extends DisplaySettings {
         this.location.set(location);
     }
 
+    /**
+     * Returns the title of the display window.
+     *
+     * @return the title of the display window.
+     */
     public final String getTitle() {
         return title;
     }
 
+    /**
+     * Sets the size of the display window in pixels.
+     *
+     * @param width the width of the display window in pixels.
+     * @param height the height of the display window in pixels.
+     * @return these settings for the purpose of call chaining.
+     */
     public final WindowSettings setSize(final int width, final int height) {
         this.size.set(width, height);
         return this;
     }
 
+    /**
+     * Returns the width of the display window in pixels.
+     *
+     * @return the width of the display window in pixels.
+     */
     public final int getWidth() {
         return (int) size.getX();
     }
 
+    /**
+     * Returns the height of the display window in pixels.
+     *
+     * @return the height of the display window in pixels.
+     */
     public final int getHeight() {
         return (int) size.getY();
     }
 
     /**
-     * Indicates the upper left corner position of the display window.
+     * Sets the location of the {@link Display display} window.
      *
      * @param xLoc the upper left corner x-axis position of the window..
      * @param yLoc the upper left corner y-axis position of the window.
@@ -105,10 +146,20 @@ public class WindowSettings extends DisplaySettings {
         return this;
     }
 
+    /**
+     * Returns the upper left corner x-axis position of the window.
+     *
+     * @return the upper left corner x-axis position of the display window.
+     */
     public final int getX() {
         return (int) location.getX();
     }
 
+    /**
+     * Returns the upper left corner y-axis position of the window.
+     *
+     * @return the upper left corner y-axis position of the window.
+     */
     public final int getY() {
         return (int) location.getY();
     }
@@ -124,6 +175,12 @@ public class WindowSettings extends DisplaySettings {
         return this;
     }
 
+    /**
+     * Indicates if the display window should be resizable by the user.
+     *
+     * @return true if the display window can be resized by the user, false
+     * otherwise.
+     */
     public final boolean isResizable() {
         return resizable;
     }
@@ -139,6 +196,12 @@ public class WindowSettings extends DisplaySettings {
         return this;
     }
 
+    /**
+     * Indicates if the display window title bar should be shown.
+     *
+     * @return true if the display window title should be visible, false
+     * otherwise.
+     */
     public final boolean isDecorated() {
         return decorated;
     }
@@ -148,13 +211,18 @@ public class WindowSettings extends DisplaySettings {
      *
      * @param maximized true to make the display window maximized, false
      * otherwise.
-     * @return
+     * @return these settings for the purpose of call chaining.
      */
     public final WindowSettings setMaximized(final boolean maximized) {
         this.maximized = maximized;
         return this;
     }
 
+    /**
+     * Indicates if the display window should be maximized.
+     *
+     * @return true if the display window should be maximized, false otherwise.
+     */
     public final boolean isMaximized() {
         return maximized;
     }
