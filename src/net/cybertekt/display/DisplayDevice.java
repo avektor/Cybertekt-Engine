@@ -26,12 +26,12 @@ public final class DisplayDevice {
     private final String name;
 
     /**
-     * Estimated physical size of the device display in millimeters.
+     * Estimated physical size of the display device in millimeters.
      */
     private final Vec2f size = new Vec2f();
 
     /**
-     * Virtual position of the physical device in screen coordinates.
+     * Virtual position of the display device in screen coordinates.
      */
     private final Vec2f position = new Vec2f();
 
@@ -52,11 +52,14 @@ public final class DisplayDevice {
      * {@link net.cybertekt.core.display Display} package.
      *
      * @param id the GLFW Pointer ID that identifies the physical device.
-     * @param name
-     * @param size
-     * @param position
+     * @param name the name of the physical display device.
+     * @param size the estimated physical size of the display device in
+     * millimeters.
+     * @param position the virtual position of the display device in screen
+     * coordinates.
      * @param mode indicates the device's current display mode.
-     * @param supportedDisplayModes
+     * @param supportedDisplayModes the list of alternative
+     * {@link DisplayMode display modes} supported by the device.
      */
     public DisplayDevice(final long id, final String name, final Vec2f size, final Vec2f position, final DisplayMode mode, final List<DisplayMode> supportedDisplayModes) {
         this.id = id;
@@ -147,18 +150,39 @@ public final class DisplayDevice {
         return (int) position.getY();
     }
 
+    /**
+     * Returns the current resolution of the display device in pixels.
+     *
+     * @return the current resolution of the display device in pixels.
+     */
     public final Vec2f getResolution() {
         return settings.getResolution();
     }
 
+    /**
+     * Returns the current refresh rate of the display device.
+     *
+     * @return the refresh rate of the display device.
+     */
     public final int getRefreshRate() {
         return settings.getRefreshRate();
     }
 
+    /**
+     * Returns the number of bits per pixel.
+     *
+     * @return the number of bits per pixel.
+     */
     public final int getBpp() {
         return settings.getBpp();
     }
 
+    /**
+     * Returns the current {@link DisplayMode display mode} for this display
+     * device.
+     *
+     * @return the current {@link DisplayMode display mode} of this device.
+     */
     public final DisplayMode getDisplayMode() {
         return settings;
     }
