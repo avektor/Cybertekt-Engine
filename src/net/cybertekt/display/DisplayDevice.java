@@ -6,8 +6,8 @@ import net.cybertekt.math.Vec2f;
 /**
  * Display Device - (C) Cybertekt Software.
  *
- * Immutable class that stores the physical properties and settings of a display
- * device.
+ * Immutable class that stores the physical properties, current settings, and
+ * supported settings of a display device.
  *
  * @version 1.0.0
  * @since 1.0.0
