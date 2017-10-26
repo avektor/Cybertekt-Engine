@@ -50,31 +50,15 @@ public class InputTest extends Application implements InputListener {
         
         display.addInputMapping("[Copy]", new InputSequence(Input.State.Pressed, Input.Mod.Ctrl, Input.Key.C));
         display.addInputMapping("[Paste]", new InputSequence(Input.State.Pressed, Input.Mod.Ctrl, Input.Key.V));
+        display.addInputMapping("[Undo]", new InputSequence(Input.State.Pressed, Input.Mod.Ctrl, Input.Key.Z));
+        display.addInputMapping("[Redo]", new InputSequence(Input.State.Pressed, Input.Mod.Ctrl, Input.Key.Y));     
         
         display.addInputMapping("[Walking]", new InputSequence(Input.State.Held, Input.Key.W));
         display.addInputMapping("[Running]", new InputAction(Input.State.Held, Input.Mod.Shift, Input.Key.W));
         
         display.addInputMapping("[Ctrl + Alt + C]", new InputSequence(Input.State.Pressed, Input.Mod.Ctrl, Input.Mod.Alt, Input.Key.C));
         
-        //display.addInputMapping("[Copy]", new InputSequence(Input.Key.CtrlLeft, Input.Key.C));
-        
-        //display.addInputMapping("[X] Pressed", new InputMapping(Input.Key.X, Input.State.Pressed, Input.Mode.Trigger));
-        //display.addInputMapping("[X] Released", new InputMapping(Input.Key.X, Input.State.Released, Input.Mode.Trigger)); 
-        //display.addInputMapping("[X]", new InputMapping(true, Input.Key.X).when(Input.State.Pressed));
-        //display.addInputMapping("[Ctrl + Shift + X]", new InputMapping(Input.Mod.Ctrl, Input.Mod.Shift, Input.Key.X).when(Input.State.Held));
-        
-        //display.addInputMapping("[Ctrl + C]", new InputMapping(Input.Mod.Ctrl, Input.Key.C).when(Input.State.Pressed));
-        //display.addInputMapping("[Ctrl + Alt + C", new InputMapping(Input.Mod.Ctrl, Input.Mod.Alt, Input.Key.C).when(Input.State.Pressed));
-        
-        //display.addInputMapping("[B]", new InputMapping(Input.Key.B).when(Input.State.Pressed, Input.State.Held, Input.State.Released));
-        
-        //display.addInputMapping("[Scroll Up]", new InputMapping(Input.Mouse.ScrollUp).when(Input.State.Pressed));
-        //display.addInputMapping("[Scroll Down]", new InputMapping(Input.Mouse.ScrollDown).when(Input.State.Pressed));
-        
-        //display.addInputMapping("[Shift + Scroll Up]", new InputMapping(Input.Mod.Shift, Input.Mouse.ScrollUp).when(Input.State.Pressed));
-        //display.addInputMapping("[Shift + Scroll Down]", new InputMapping(Input.Mod.Shift, Input.Mouse.ScrollDown).when(Input.State.Pressed));
-        
-        //display.addInputMapping("[Left Alt]", new InputMapping(Input.Key.AltLeft).when(Input.State.Pressed));
+        display.addInputMapping("info", new InputSequence(Input.State.Pressed, Input.Mod.Ctrl, Input.Key.I));
         
         display.addInputListener(this);
     }
@@ -91,10 +75,16 @@ public class InputTest extends Application implements InputListener {
     
     @Override
     public final void onInput(final Display display, final String mapping, final float tpf) {
-        if (mapping.equals("exit")) {
-            stop();
-        } else {
-            log.info("{}", mapping);
+        switch (mapping) {
+            case "exit":
+                stop();
+                break;
+            case "info":
+                log.info("{} - {}", display.getSize(), display.getResolution());
+                break;
+            default:
+                log.info("{}", mapping);
+                break;
         }
     }
 }
