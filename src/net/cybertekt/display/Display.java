@@ -226,12 +226,12 @@ public final class Display {
 
             /* Set initial window position */
             glfwSetWindowPos(display.ID, settings.getX(), settings.getY());
-            
+
             /* Set display window title (if not null) */
             if (settings.getTitle() != null) {
                 glfwSetWindowTitle(display.ID, settings.getTitle());
             }
-            
+
             /* Attach Display Callbacks */
             glfwSetWindowCloseCallback(display.ID, CALLBACK_CLOSE);
             glfwSetWindowPosCallback(display.ID, CALLBACK_POSITION);
@@ -278,9 +278,10 @@ public final class Display {
     }
 
     /**
-     * Input Polling.
+     * Polls input from GLFW and calls the {@link Display#poll(float) poll()}
+     * method of each active display.
      *
-     * @param tpf
+     * @param tpf the time per frame.
      */
     public static final void poll(final float tpf) {
         glfwPollEvents();
@@ -290,6 +291,10 @@ public final class Display {
         });
     }
 
+    /**
+     * Calls the {@link Display#render(net.cybertekt.display.Display) render()}
+     * method of each active display.
+     */
     public static final void render() {
         DISPLAYS.values().stream().forEach((display) -> {
             render(display);
@@ -409,12 +414,18 @@ public final class Display {
     private final long ID;
 
     /**
-     *
+     * Stores the active (pressed) input events received from GLFW.
      */
     private final List<Input> INPUT = new ArrayList();
 
+    /**
+     * Used for retrieving the width of the display and frame buffer from GLFW.
+     */
     private final IntBuffer WIDTH = MemoryUtil.memAllocInt(1);
 
+    /**
+     * Used for retrieving the height of the display and frame buffer from GLFW.
+     */
     private final IntBuffer HEIGHT = MemoryUtil.memAllocInt(1);
 
     /**
@@ -465,10 +476,22 @@ public final class Display {
         ID = displayId;
     }
 
+    /**
+     * Moves the {@link Display display} to a new position.
+     *
+     * @param xPos the new x-axis position of the display.
+     * @param yPos the new y-axis position of the display.
+     */
     public final void move(final int xPos, final int yPos) {
         glfwSetWindowPos(ID, xPos, yPos);
     }
 
+    /**
+     * Changes the size of the {@link Display display}.
+     *
+     * @param width the new width of the display.
+     * @param height the new height of the display.
+     */
     public final void resize(final int width, final int height) {
         glfwSetWindowSize(ID, width, height);
     }
@@ -681,12 +704,13 @@ public final class Display {
     }
 
     /**
-     * Updates the {@link #INPUT input map}.
+     * Receives input events from GLFW and uses them to update the
+     * {@link #INPUT input map}.
      *
-     * @param input
-     * @param event
+     * @param input the input received from GLFW.
+     * @param event the input event received from GLFW.
      */
-    public final void onInput(final Input input, final Input.State event, final int mods) {
+    public final void onInput(final Input input, final Input.State event) {
 
         Input.Mod m = getModifier(input);
         if (m != null) {
@@ -716,6 +740,17 @@ public final class Display {
         //log.info("Character Pressed: " + key);
     }
 
+    /**
+     * Retrieves the {@link Input.Mod input modifier} associated with an
+     * {@link Input.Key input key}. Returns null if the parameter
+     * {@link Input input} is not an {@link Input.Mod input modifier}.
+     *
+     * @param input the {@link Input.Key input key} for which to retrieve the
+     * associated {@link Input.Mod input modifier}.
+     * @return the {@link Input.Mod input modifier} associated with the
+     * parameter {@link Input input}, or null if the provided input does not
+     * have an equivalent {@link Input.Mod input modifier}.
+     */
     private Input.Mod getModifier(final Input input) {
         if (input == Input.Key.AltLeft || input == Input.Key.AltRight) {
             return Input.Mod.Alt;
@@ -766,15 +801,20 @@ public final class Display {
     }
 
     /**
-     * Returns the current size of the display.
+     * Returns the current size of the display in screen coordinates.
      *
-     * @return
+     * @return the size of the display in screen coordinates.
      */
     public final Vec2f getSize() {
         glfwGetWindowSize(ID, WIDTH, HEIGHT);
         return new Vec2f(WIDTH.get(0), HEIGHT.get(0));
     }
 
+    /**
+     * Returns the current resolution of the display framebuffer in pixels.
+     *
+     * @return the resolution of the display framebuffer in pixels.
+     */
     public final Vec2f getResolution() {
         glfwGetFramebufferSize(ID, WIDTH, HEIGHT);
         return new Vec2f(WIDTH.get(0), HEIGHT.get(0));
@@ -905,18 +945,36 @@ public final class Display {
         INPUT_LISTENERS.remove(toRemove);
     }
 
+    /**
+     * Removes all {@link InputListener input listeners} from this display.
+     */
     public final void clearInputListeners() {
         INPUT_LISTENERS.clear();
     }
 
+    /**
+     * Adds a named {@link InputMapping input mapping} to this display.
+     *
+     * @param name the name of the {@link InputMapping input mapping}.
+     * @param mapping the {@link InputMapping input mapping} to add to this
+     * display.
+     */
     public final void addInputMapping(final String name, final InputMapping mapping) {
         INPUT_MAPPINGS.put(name, mapping);
     }
 
+    /**
+     * Removes a named {@link InputMapping input mapping} from this display.
+     *
+     * @param name the name of the {@link InputMapping input mapping} to remove.
+     */
     public final void removeInputMapping(final String name) {
         INPUT_MAPPINGS.remove(name);
     }
 
+    /**
+     * Removes all {@link InputMapping input mappings} from this display.
+     */
     public final void clearInputMappings() {
         INPUT_MAPPINGS.clear();
     }
@@ -1095,7 +1153,7 @@ public final class Display {
     private static final GLFWKeyCallback CALLBACK_KEY = new GLFWKeyCallback() {
         @Override
         public void invoke(long id, int key, int scancode, int action, int mods) {
-            DISPLAYS.get(id).onInput(KEY_MAP.get(key), STATE_MAP.get(action), mods);
+            DISPLAYS.get(id).onInput(KEY_MAP.get(key), STATE_MAP.get(action));
         }
     };
 
@@ -1142,7 +1200,7 @@ public final class Display {
     private static final GLFWMouseButtonCallback CALLBACK_MOUSE_BUTTON = new GLFWMouseButtonCallback() {
         @Override
         public void invoke(final long id, final int button, final int action, final int mods) {
-            DISPLAYS.get(id).onInput(MOUSE_BUTTON_MAP.get(button), STATE_MAP.get(action), mods);
+            DISPLAYS.get(id).onInput(MOUSE_BUTTON_MAP.get(button), STATE_MAP.get(action));
         }
     };
 
