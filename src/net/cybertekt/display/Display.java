@@ -83,6 +83,7 @@ import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWCursorEnterCallback;
 import net.cybertekt.display.input.InputListener;
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwGetMonitorPhysicalSize;
@@ -273,6 +274,7 @@ public final class Display {
                 toDestroy.renderer.destroy();
             }
             DISPLAYS.remove(toDestroy.getId());
+            toDestroy.onDestroy();
             glfwDestroyWindow(toDestroy.getId());
         }
     }
@@ -734,6 +736,14 @@ public final class Display {
                 }
             }
         }
+    }
+    
+    /**
+     * Called when the display is destroyed.
+     */
+    public void onDestroy() {
+        MemoryUtil.memFree(WIDTH);
+        MemoryUtil.memFree(HEIGHT);
     }
 
     private void onChar(final char key) {
