@@ -1,5 +1,6 @@
- package net.cybertekt.asset;
+ package net.cybertekt.render;
 
+import net.cybertekt.asset.*;
 import java.util.HashMap;
 import java.util.Map;
 import net.cybertekt.app.BasicApplication;
@@ -7,8 +8,6 @@ import net.cybertekt.asset.shader.OGLShader;
 import net.cybertekt.display.Display;
 import net.cybertekt.exception.OGLException;
 import net.cybertekt.mesh.Mesh;
-import net.cybertekt.render.OGLShaderProgram;
-import net.cybertekt.render.Renderer;
 import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -33,7 +32,8 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
  * @since 1.0.0
  * @author Andrew Vektor
  */
-public class ShaderTest extends BasicApplication implements Renderer {
+ 
+public class RenderTest extends BasicApplication implements Renderer {
     
     /**
      * 
@@ -61,12 +61,12 @@ public class ShaderTest extends BasicApplication implements Renderer {
     private Mesh quad;
 
     public static void main(final String[] args) {
-        ShaderTest app = new ShaderTest();
+        RenderTest app = new RenderTest();
         app.initialize();
     }
 
-    public ShaderTest() {
-        super("Shader Unit Test");
+    public RenderTest() {
+        super("Render Unit Test");
     }
 
     @Override
