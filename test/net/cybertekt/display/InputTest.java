@@ -40,8 +40,12 @@ public class InputTest extends Application implements InputListener {
      */
     @Override
     public final void init() {
-        /* Create a display */
-        display = Display.create(new WindowSettings("Input Test Display Window", new Vec2f(800, 600)));
+        /* Define Display Settings */
+        DisplaySettings settings = new WindowSettings("Input Test - Cybertekt Software", new Vec2f(800, 600));
+        settings.setVerticalSync(true);
+        
+        /* Create The Display Window */
+        display = Display.create(settings);
         display.setRenderer(new OGLRenderer());
         
         /* Create and register an action mapping in order to exit the application when the escape key is pressed */
