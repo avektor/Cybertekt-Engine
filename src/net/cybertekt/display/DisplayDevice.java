@@ -1,7 +1,7 @@
 package net.cybertekt.display;
 
 import java.util.List;
-import net.cybertekt.math.Vec2f;
+import org.joml.Vector2f;
 
 /**
  * Display Device - (C) Cybertekt Software.
@@ -28,12 +28,12 @@ public final class DisplayDevice {
     /**
      * Estimated physical size of the display device in millimeters.
      */
-    private final Vec2f size = new Vec2f();
+    private final Vector2f size = new Vector2f();
 
     /**
      * Virtual position of the display device in screen coordinates.
      */
-    private final Vec2f position = new Vec2f();
+    private final Vector2f position = new Vector2f();
 
     /**
      * Current {@link DisplayMode display settings} for the device.
@@ -61,7 +61,7 @@ public final class DisplayDevice {
      * @param supportedDisplayModes the list of alternative
      * {@link DisplayMode display modes} supported by the device.
      */
-    public DisplayDevice(final long id, final String name, final Vec2f size, final Vec2f position, final DisplayMode mode, final List<DisplayMode> supportedDisplayModes) {
+    public DisplayDevice(final long id, final String name, final Vector2f size, final Vector2f position, final DisplayMode mode, final List<DisplayMode> supportedDisplayModes) {
         this.id = id;
         this.name = name;
         this.size.set(size);
@@ -95,7 +95,7 @@ public final class DisplayDevice {
      *
      * @return the estimated size of this device.
      */
-    public final Vec2f getSize() {
+    public final Vector2f getSize() {
         return size;
     }
 
@@ -107,7 +107,7 @@ public final class DisplayDevice {
      * @return the estimated width of this device.
      */
     public final int getWidth() {
-        return (int) size.getX();
+        return (int) size.x();
     }
 
     /**
@@ -118,7 +118,7 @@ public final class DisplayDevice {
      * @return the estimated height of this device.
      */
     public final int getHeight() {
-        return (int) size.getY();
+        return (int) size.y();
     }
 
     /**
@@ -126,7 +126,7 @@ public final class DisplayDevice {
      *
      * @return the virtual position of this device.
      */
-    public final Vec2f getPosition() {
+    public final Vector2f getPosition() {
         return position;
     }
 
@@ -137,7 +137,7 @@ public final class DisplayDevice {
      * @return the virtual x-axis position of this device.
      */
     public final int getPositionX() {
-        return (int) position.getX();
+        return (int) position.x();
     }
 
     /**
@@ -147,7 +147,7 @@ public final class DisplayDevice {
      * @return the virtual y-axis position of this device.
      */
     public final int getPositionY() {
-        return (int) position.getY();
+        return (int) position.y();
     }
 
     /**
@@ -155,7 +155,7 @@ public final class DisplayDevice {
      *
      * @return the current resolution of the display device in pixels.
      */
-    public final Vec2f getResolution() {
+    public final Vector2f getResolution() {
         return settings.getResolution();
     }
 
@@ -214,12 +214,12 @@ public final class DisplayDevice {
      * Indicates if the specified display resolution is supported by this
      * display device.
      *
-     * @param resolution a {@link Vec2f vector} that specifies the display
+     * @param resolution a {@link Vector2f vector} that specifies the display
      * resolution in pixels.
      * @return true if the specified display resolution is supported by this
      * device, false otherwise.
      */
-    public final boolean isResolutionSupported(final Vec2f resolution) {
+    public final boolean isResolutionSupported(final Vector2f resolution) {
         return resolution == null ? false : supportedSettings.stream().anyMatch((m) -> (m.getResolution().equals(resolution)));
     }
 

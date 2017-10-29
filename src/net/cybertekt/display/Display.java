@@ -12,7 +12,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import net.cybertekt.display.input.InputMapping;
 import net.cybertekt.exception.InitializationException;
-import net.cybertekt.math.Vec2f;
 import net.cybertekt.render.OGLRenderer;
 import net.cybertekt.render.Renderer;
 import org.lwjgl.BufferUtils;
@@ -83,7 +82,7 @@ import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import org.lwjgl.glfw.GLFWCharCallback;
 import org.lwjgl.glfw.GLFWCursorEnterCallback;
 import net.cybertekt.display.input.InputListener;
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
+import org.joml.Vector2f;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwGetMonitorPhysicalSize;
@@ -93,7 +92,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
 import org.lwjgl.glfw.GLFWWindowPosCallback;
 import static org.lwjgl.opengl.GL11.glViewport;
-import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.system.MemoryStack;
 
 /**
  * Display - (C) Cybertekt Software
@@ -274,7 +273,6 @@ public final class Display {
                 toDestroy.renderer.destroy();
             }
             DISPLAYS.remove(toDestroy.getId());
-            toDestroy.onDestroy();
             glfwDestroyWindow(toDestroy.getId());
         }
     }
@@ -419,16 +417,6 @@ public final class Display {
      * Stores the active (pressed) input events received from GLFW.
      */
     private final List<Input> INPUT = new ArrayList();
-
-    /**
-     * Used for retrieving the width of the display and frame buffer from GLFW.
-     */
-    private final IntBuffer WIDTH = MemoryUtil.memAllocInt(1);
-
-    /**
-     * Used for retrieving the height of the display and frame buffer from GLFW.
-     */
-    private final IntBuffer HEIGHT = MemoryUtil.memAllocInt(1);
 
     /**
      * Stores all {@link DisplayListener display listeners} attached to the
@@ -737,14 +725,6 @@ public final class Display {
             }
         }
     }
-    
-    /**
-     * Called when the display is destroyed.
-     */
-    public void onDestroy() {
-        MemoryUtil.memFree(WIDTH);
-        MemoryUtil.memFree(HEIGHT);
-    }
 
     private void onChar(final char key) {
         //log.info("Character Pressed: " + key);
@@ -815,9 +795,13 @@ public final class Display {
      *
      * @return the size of the display in screen coordinates.
      */
-    public final Vec2f getSize() {
-        glfwGetWindowSize(ID, WIDTH, HEIGHT);
-        return new Vec2f(WIDTH.get(0), HEIGHT.get(0));
+    public final Vector2f getSize() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer width = stack.mallocInt(1);
+            IntBuffer height = stack.mallocInt(1);
+            glfwGetWindowSize(ID, width, height);
+            return new Vector2f(width.get(0), height.get(0));
+        }
     }
 
     /**
@@ -825,10 +809,23 @@ public final class Display {
      *
      * @return the resolution of the display framebuffer in pixels.
      */
-    public final Vec2f getResolution() {
-        glfwGetFramebufferSize(ID, WIDTH, HEIGHT);
-        return new Vec2f(WIDTH.get(0), HEIGHT.get(0));
+    public final Vector2f getResolution() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer width = stack.mallocInt(1);
+            IntBuffer height = stack.mallocInt(1);
+            glfwGetFramebufferSize(ID, width, height);
+            return new Vector2f(width.get(0), height.get(0));
+        }
     }
+
+    public final float getAspectRatio() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer width = stack.mallocInt(1);
+            IntBuffer height = stack.mallocInt(1);
+            glfwGetWindowSize(ID, width, height);
+            return ((float) width.get(0)) / ((float) height.get(0));
+        }
+   }
 
     /**
      * Indicates if this display is currently visible.
@@ -1075,13 +1072,13 @@ public final class Display {
                 x.rewind();
                 y.rewind();
                 glfwGetMonitorPhysicalSize(id, x, y);
-                Vec2f size = new Vec2f(x.get(), y.get());
+                Vector2f size = new Vector2f(x.get(), y.get());
 
                 /* Get Device Position */
                 x.rewind();
                 y.rewind();
                 glfwGetMonitorPos(id, x, y);
-                Vec2f position = new Vec2f(x.get(), y.get());
+                Vector2f position = new Vector2f(x.get(), y.get());
 
                 /* Get Supported Display Modes */
                 GLFWVidMode.Buffer modes = glfwGetVideoModes(id);

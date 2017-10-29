@@ -1,6 +1,6 @@
 package net.cybertekt.display;
 
-import net.cybertekt.math.Vec2f;
+import org.joml.Vector2f;
 
 /**
  * Display Settings - (C) Cybertekt Software
@@ -27,12 +27,12 @@ public class WindowSettings extends DisplaySettings {
      * Specifies the width and height of the display window specified in screen
      * coordinates.
      */
-    private final Vec2f size = new Vec2f();
+    private final Vector2f size = new Vector2f();
 
     /**
      * Indicates where the window should be positioned on initialization.
      */
-    private final Vec2f location = new Vec2f();
+    private final Vector2f location = new Vector2f();
 
     /**
      * Determines if the user should be permitted to resize the window. Enabled
@@ -66,7 +66,7 @@ public class WindowSettings extends DisplaySettings {
      * @param title the title of the display window.
      */
     public WindowSettings(final String title) {
-        this(title, new Vec2f(800f, 600f));
+        this(title, new Vector2f(800f, 600f));
     }
 
     /**
@@ -76,8 +76,8 @@ public class WindowSettings extends DisplaySettings {
      * @param title the title of the display window.
      * @param size the width and height of the display window in pixels.
      */
-    public WindowSettings(final String title, final Vec2f size) {
-        this(title, size, Display.getPrimaryDisplayDevice().getResolution().divideLocal(2f).subtractLocal(size.divide(2f)));
+    public WindowSettings(final String title, final Vector2f size) {
+        this(title, size, new Vector2f(Display.getPrimaryDisplayDevice().getResolution().x() / 2f, Display.getPrimaryDisplayDevice().getResolution().y() / 2f).sub(size.x() / 2f, size.y() / 2f));
     }
 
     /**
@@ -88,7 +88,7 @@ public class WindowSettings extends DisplaySettings {
      * @param size the width and height of the display window in pixels.
      * @param location the initial location of the display window.
      */
-    public WindowSettings(final String title, final Vec2f size, final Vec2f location) {
+    public WindowSettings(final String title, final Vector2f size, final Vector2f location) {
         super(Display.getPrimaryDisplayDevice());
         this.title = title;
         this.size.set(size);
@@ -122,7 +122,7 @@ public class WindowSettings extends DisplaySettings {
      * @return the width of the display window in pixels.
      */
     public final int getWidth() {
-        return (int) size.getX();
+        return (int) size.x();
     }
 
     /**
@@ -131,7 +131,7 @@ public class WindowSettings extends DisplaySettings {
      * @return the height of the display window in pixels.
      */
     public final int getHeight() {
-        return (int) size.getY();
+        return (int) size.y();
     }
 
     /**
@@ -152,7 +152,7 @@ public class WindowSettings extends DisplaySettings {
      * @return the upper left corner x-axis position of the display window.
      */
     public final int getX() {
-        return (int) location.getX();
+        return (int) location.x();
     }
 
     /**
@@ -161,7 +161,7 @@ public class WindowSettings extends DisplaySettings {
      * @return the upper left corner y-axis position of the window.
      */
     public final int getY() {
-        return (int) location.getY();
+        return (int) location.y();
     }
 
     /**
