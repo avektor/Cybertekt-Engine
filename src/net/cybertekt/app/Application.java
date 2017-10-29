@@ -32,14 +32,14 @@ public abstract class Application {
      * Any value of zero or less will force the application to update at an
      * unbounded rate. Defaults to 60 updates per second.
      */
-    private int ups = 60;
+    private float ups = 60;
 
     /**
      * The maximum number of frames to render each second. Any value of zero or
      * less will force the application to render at an unbounded rate. Defaults
      * to 60 frames per second.
      */
-    private int fps = 60;
+    private float fps = 60;
 
     /**
      * Indicates if the application loop should terminate.
@@ -75,22 +75,23 @@ public abstract class Application {
      * {@link Application#stop()}
      */
     public void loop() {
-        double start = 0;
+        double time = glfwGetTime();
         float tpf;
-
+        
         while (!stop) {
+            
             /* Calculate time since last frame */
-            tpf = (float) (glfwGetTime() - start);
+            tpf = (float) (glfwGetTime() - time);
 
             /* Set the frame start time */
-            start = glfwGetTime();
+            time = (float) glfwGetTime();
 
-            /* Poll */
+            /* Poll */ 
             Display.poll(tpf);
 
             /* Update */
             update(tpf);
-
+            
             /* Render */
             Display.render();
         }
@@ -106,7 +107,7 @@ public abstract class Application {
     public void stop() {
         stop = true;
     }
-
+    
     /**
      * Application Initialization.
      */
