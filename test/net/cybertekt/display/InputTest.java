@@ -3,11 +3,10 @@ package net.cybertekt.display;
 import net.cybertekt.app.Application;
 import net.cybertekt.display.input.Input;
 import net.cybertekt.display.input.InputAction;
-import net.cybertekt.math.Vec2f;
 import net.cybertekt.render.OGLRenderer;
 import net.cybertekt.display.input.InputListener;
-import net.cybertekt.display.input.InputMapping;
 import net.cybertekt.display.input.InputSequence;
+import org.joml.Vector2f;
 
 /**
  * Input Unit Test - (C) Cybertekt Software
@@ -41,7 +40,7 @@ public class InputTest extends Application implements InputListener {
     @Override
     public final void init() {
         /* Define Display Settings */
-        DisplaySettings settings = new WindowSettings("Input Test - Cybertekt Software", new Vec2f(800, 600));
+        DisplaySettings settings = new WindowSettings("Input Test - Cybertekt Software", new Vector2f(800, 600));
         settings.setVerticalSync(true);
         
         /* Create The Display Window */
@@ -84,7 +83,7 @@ public class InputTest extends Application implements InputListener {
                 stop();
                 break;
             case "info":
-                log.info("{} - {}", display.getSize(), display.getResolution());
+                log.info("{} - {} - {}", display.getSize(), display.getResolution(), display.getAspectRatio());
                 break;
             default:
                 log.info("{}", mapping);
