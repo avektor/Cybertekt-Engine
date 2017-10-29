@@ -1,8 +1,8 @@
 package net.cybertekt.display;
 
 import java.util.Objects;
-import net.cybertekt.math.Vec2f;
-import net.cybertekt.math.Vec3f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFWVidMode;
 
 /**
@@ -21,7 +21,7 @@ public final class DisplayMode {
      * Width and height of the display in screen coordinates (usually, but not
      * always, pixels).
      */
-    private final Vec2f resolution;
+    private final Vector2f resolution;
 
     /**
      * Screen refresh rate.
@@ -31,7 +31,7 @@ public final class DisplayMode {
     /**
      * Number of bits per pixel for each color channel.
      */
-    private final Vec3f bpp;
+    private final Vector3f bpp;
 
     /**
      * Constructs an immutable display mode from a GLFW
@@ -41,7 +41,7 @@ public final class DisplayMode {
      * for constructing this display mode.
      */
     public DisplayMode(final GLFWVidMode mode) {
-        this(new Vec2f(mode.width(), mode.height()), mode.refreshRate(), new Vec3f(mode.redBits(), mode.blueBits(), mode.greenBits()));
+        this(new Vector2f(mode.width(), mode.height()), mode.refreshRate(), new Vector3f(mode.redBits(), mode.blueBits(), mode.greenBits()));
     }
 
     /**
@@ -51,21 +51,21 @@ public final class DisplayMode {
      * @param refreshRate the refresh rate of the display in hertz.
      * @param bpp the number of bits per pixel in each color channel.
      */
-    public DisplayMode(final Vec2f resolution, final int refreshRate, final Vec3f bpp) {
+    public DisplayMode(final Vector2f resolution, final int refreshRate, final Vector3f bpp) {
         this.resolution = resolution;
         this.refreshRate = refreshRate;
         this.bpp = bpp;
     }
 
     /**
-     * Returns a copy of the {@link Vec2f vector} that stores the display
+     * Returns a copy of the {@link Vector2f vector} that stores the display
      * resolution as screen coordinates.
      *
-     * @return a copy of the {@link Vec2f vector} that stores the display
+     * @return a copy of the {@link Vector2f vector} that stores the display
      * resolution screen coordinates.
      */
-    public final Vec2f getResolution() {
-        return resolution.copy();
+    public final Vector2f getResolution() {
+        return new Vector2f(resolution);
     }
 
     /**
@@ -74,7 +74,7 @@ public final class DisplayMode {
      * @return the width of the display resolution as screen coordinates.
      */
     public final int getWidth() {
-        return (int) resolution.getX();
+        return (int) resolution.x();
     }
 
     /**
@@ -83,7 +83,7 @@ public final class DisplayMode {
      * @return the height of the display resolution as screen coordinates.
      */
     public final int getHeight() {
-        return (int) resolution.getY();
+        return (int) resolution.y();
     }
 
     /**
@@ -102,7 +102,7 @@ public final class DisplayMode {
      * @return the total number of bits per pixel.
      */
     public final int getBpp() {
-        return (int) (bpp.getX() + bpp.getY() + bpp.getZ());
+        return (int) (bpp.x() + bpp.y() + bpp.z());
     }
 
     /**
