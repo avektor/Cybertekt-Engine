@@ -1,5 +1,9 @@
 package net.cybertekt.math;
 
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+
 /**
  * Transform - (C) Cybertekt Software.
  *
@@ -15,17 +19,17 @@ public final class Transform {
     /**
      * Translation (position) component.
      */
-    private Vec3f translation = new Vec3f(0f, 0f, 0f);
+    private Vector3f translation;
 
     /**
      * Rotation (orientation) component.
      */
-    private Quaternion rotation = new Quaternion();
+    private Quaternionf rotation;
 
     /**
      * Scale (size) component.
      */
-    private Vec3f scale = new Vec3f(0f, 0f, 0f);
+    private Vector3f scale;
 
     /**
      * Constructs a transform with a default translation, rotation, and scale.
@@ -33,7 +37,7 @@ public final class Transform {
      * quaternion, and default scale is one.
      */
     public Transform() {
-        this(new Vec3f(0f, 0f, 0f), new Quaternion(), new Vec3f(1f, 1f, 1f));
+        this(new Vector3f(0f, 0f, 0f), new Quaternionf(), new Vector3f(1f, 1f, 1f));
     }
 
     /**
@@ -46,14 +50,14 @@ public final class Transform {
      * is null.
      */
     public Transform(final Transform toCopy) {
-        this(new Vec3f(toCopy.getTranslation()), new Quaternion(toCopy.getRotation()), new Vec3f(toCopy.getScale()));
+        this(new Vector3f(toCopy.getTranslation()), new Quaternionf(toCopy.getRotation()), new Vector3f(toCopy.getScale()));
     }
 
-    public Transform(final Vec3f translation, final Quaternion rotation, final Vec3f scale) {
+    public Transform(final Vector3f translation, final Quaternionf rotation, final Vector3f scale) {
         this(translation, scale, rotation);
     }
 
-    public Transform(final Vec3f translation, final Vec3f scale, final Quaternion rotation) {
+    public Transform(final Vector3f translation, final Vector3f scale, final Quaternionf rotation) {
         setTranslation(translation);
         setScale(scale);
         setRotation(rotation);
@@ -67,14 +71,15 @@ public final class Transform {
      * @return
      */
     public final Transform mult(final Transform toMult) {
-        return new Transform(translation.mult(toMult.getTranslation()), scale.mult(toMult.getScale()), rotation.mult(toMult.getRotation()));
+        return new Transform(new Vector3f(translation).mul(toMult.getTranslation()), new Quaternionf(rotation).mul(toMult.getRotation()), new Vector3f(scale).mul(toMult.getScale()));
     }
 
     /**
      * Internally multiplies the components of this transform by the parameter
      * transform. This method modifies the internal fields of this transform.
      * This method does not make any internal changes to the parameter
-     * transform.<br /><br />
+     * transform.
+     * 
      * Mathematically equivalent to:
      * <i>This Translation * Other Translation, This Scale * Other Scale, This
      * Rotation * Other Rotation.</i>
@@ -83,17 +88,9 @@ public final class Transform {
      * @return this transform.
      */
     public final Transform multLocal(final Transform toMult) {
-        translation.multLocal(toMult.getTranslation());
-        scale.multLocal(toMult.getScale());
-        rotation.multLocal(toMult.getRotation());
-        return this;
-    }
-
-    public final Transform combine(final Transform parent) {
-        scale.multLocal(parent.scale);
-        parent.rotation.mult(rotation, rotation);
-        translation.multLocal(parent.scale);
-        parent.rotation.multLocal(translation).addLocal(parent.translation);
+        translation.mul(toMult.getTranslation());
+        scale.mul(toMult.getScale());
+        rotation.mul(toMult.getRotation());
         return this;
     }
 
@@ -102,7 +99,7 @@ public final class Transform {
      *
      * @param toSet the translation to set.
      */
-    public final void setTranslation(final Vec3f toSet) {
+    public final void setTranslation(final Vector3f toSet) {
         translation = toSet;
     }
 
@@ -122,7 +119,7 @@ public final class Transform {
      *
      * @return the translation component of this transform.
      */
-    public final Vec3f getTranslation() {
+    public final Vector3f getTranslation() {
         return translation;
     }
 
@@ -134,7 +131,7 @@ public final class Transform {
      * transform.
      */
     public final Matrix4f getTranslationMatrix() {
-        return Matrix4f.translation(translation);
+        return new Matrix4f().translation(translation);
     }
 
     /**
@@ -142,7 +139,7 @@ public final class Transform {
      *
      * @param toSet the rotation component of this transform.
      */
-    public final void setRotation(final Quaternion toSet) {
+    public final void setRotation(final Quaternionf toSet) {
         rotation = toSet;
     }
 
@@ -151,7 +148,7 @@ public final class Transform {
      *
      * @return the rotation rotation component of this transform.
      */
-    public final Quaternion getRotation() {
+    public final Quaternionf getRotation() {
         return rotation;
     }
 
@@ -162,7 +159,7 @@ public final class Transform {
      * transform.
      */
     public final Matrix4f getRotationMatrix() {
-        return Matrix4f.rotation(rotation);
+        return new Matrix4f().rotation(rotation);
     }
 
     /**
@@ -170,7 +167,7 @@ public final class Transform {
      *
      * @param toSet the scale vector to set.
      */
-    public final void setScale(final Vec3f toSet) {
+    public final void setScale(final Vector3f toSet) {
         scale = toSet;
     }
 
@@ -199,7 +196,7 @@ public final class Transform {
      *
      * @return the scale component of this transform.
      */
-    public final Vec3f getScale() {
+    public final Vector3f getScale() {
         return scale;
     }
 
@@ -209,13 +206,13 @@ public final class Transform {
      * @return the matrix generated from the scale component of this transform.
      */
     public final Matrix4f getScaleMatrix() {
-        return Matrix4f.scalar(scale);
+        return new Matrix4f().scale(scale);
     }
 
     /**
      * Generates a transformation matrix from the combined translation,
      * rotation, and scale components of this transform.
-     * <br /><br />
+     * 
      * Mathematically equivalent to:
      * <i>Translation Matrix * Rotation Matrix * Scale Matrix</i>
      *
@@ -223,7 +220,7 @@ public final class Transform {
      * components of this transform.
      */
     public final Matrix4f getTransformMatrix() {
-        return Matrix4f.transform(translation, rotation, scale);
+        return getTranslationMatrix().mul(getRotationMatrix()).mul(getScaleMatrix());
     }
 
 }
