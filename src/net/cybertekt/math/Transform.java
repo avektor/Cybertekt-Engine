@@ -7,7 +7,7 @@ import org.joml.Vector3f;
 /**
  * Transform - (C) Cybertekt Software.
  *
- * Defines a translation (position), rotation (orientation), and scale (size).
+ * Defines a location (position), rotation (orientation), and scale (size).
  * Methods are provided for modifying and combining transforms.
  *
  * @version 1.0.0
@@ -17,9 +17,9 @@ import org.joml.Vector3f;
 public final class Transform {
 
     /**
-     * Translation (position) component.
+     * Location (position) component.
      */
-    private Vector3f translation;
+    private Vector3f location;
 
     /**
      * Rotation (orientation) component.
@@ -32,8 +32,8 @@ public final class Transform {
     private Vector3f scale;
 
     /**
-     * Constructs a transform with a default translation, rotation, and scale.
-     * Default translation is a zero vector, default rotation is an identity
+     * Constructs a transform with a default location, rotation, and scale.
+     * Default location is a zero vector, default rotation is an identity
      * quaternion, and default scale is one.
      */
     public Transform() {
@@ -71,7 +71,7 @@ public final class Transform {
      * @return
      */
     public final Transform mult(final Transform toMult) {
-        return new Transform(new Vector3f(translation).mul(toMult.getTranslation()), new Quaternionf(rotation).mul(toMult.getRotation()), new Vector3f(scale).mul(toMult.getScale()));
+        return new Transform(new Vector3f(location).mul(toMult.getTranslation()), new Quaternionf(rotation).mul(toMult.getRotation()), new Vector3f(scale).mul(toMult.getScale()));
     }
 
     /**
@@ -79,7 +79,7 @@ public final class Transform {
      * transform. This method modifies the internal fields of this transform.
      * This method does not make any internal changes to the parameter
      * transform.
-     * 
+     *
      * Mathematically equivalent to:
      * <i>This Translation * Other Translation, This Scale * Other Scale, This
      * Rotation * Other Rotation.</i>
@@ -88,50 +88,50 @@ public final class Transform {
      * @return this transform.
      */
     public final Transform multLocal(final Transform toMult) {
-        translation.mul(toMult.getTranslation());
+        location.mul(toMult.getTranslation());
         scale.mul(toMult.getScale());
         rotation.mul(toMult.getRotation());
         return this;
     }
 
     /**
-     * Sets the translation component of this transform.
+     * Sets the location component of this transform.
      *
-     * @param toSet the translation to set.
+     * @param toSet the location to set.
      */
     public final void setTranslation(final Vector3f toSet) {
-        translation = toSet;
+        location.set(toSet);
     }
 
     /**
-     * Sets the translation component of this transform.
+     * Sets the location component of this transform.
      *
-     * @param x the x-axis translation.
-     * @param y the y-axis translation.
-     * @param z the z-axis translation.
+     * @param x the x-axis location.
+     * @param y the y-axis location.
+     * @param z the z-axis location.
      */
     public final void setTranslation(final float x, final float y, final float z) {
-        translation.set(x, y, z);
+        location.set(x, y, z);
     }
 
     /**
-     * Returns the translation component of this transform.
+     * Returns the location component of this transform.
      *
-     * @return the translation component of this transform.
+     * @return the location component of this transform.
      */
     public final Vector3f getTranslation() {
-        return translation;
+        return location;
     }
 
     /**
-     * Generates a translation matrix from the translation component of this
+     * Generates a location matrix from the location component of this
      * transform.
      *
-     * @return the translation generated from the translation component of this
+     * @return the location generated from the location component of this
      * transform.
      */
     public final Matrix4f getTranslationMatrix() {
-        return new Matrix4f().translation(translation);
+        return new Matrix4f().translation(location);
     }
 
     /**
@@ -140,7 +140,7 @@ public final class Transform {
      * @param toSet the rotation component of this transform.
      */
     public final void setRotation(final Quaternionf toSet) {
-        rotation = toSet;
+        rotation.set(toSet);
     }
 
     /**
@@ -210,13 +210,13 @@ public final class Transform {
     }
 
     /**
-     * Generates a transformation matrix from the combined translation,
-     * rotation, and scale components of this transform.
-     * 
+     * Generates a transformation matrix from the combined location, rotation,
+     * and scale components of this transform.
+     *
      * Mathematically equivalent to:
      * <i>Translation Matrix * Rotation Matrix * Scale Matrix</i>
      *
-     * @return the matrix generated from the translation, rotation, and scale of
+     * @return the matrix generated from the location, rotation, and scale of
      * components of this transform.
      */
     public final Matrix4f getTransformMatrix() {
